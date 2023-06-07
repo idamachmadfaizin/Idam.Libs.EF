@@ -11,6 +11,7 @@ public class MyDbContext : DbContext
     }
 
     public DbSet<Foo> Foos { get; set; }
+    public DbSet<Boo> Boos { get; set; }
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {

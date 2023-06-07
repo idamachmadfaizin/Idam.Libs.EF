@@ -4,22 +4,19 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Idam.Libs.EF.Sample.Models.Entity;
 
-/// <summary>
-/// Foo entity
-/// </summary>
-public class Foo : IGuidEntity, ITimeStampsUnix, ISoftDeleteUnix
+public class Boo : IGuidEntity, ITimeStamps, ISoftDelete
 {
-    public Foo()
+    public Boo()
     {
     }
 
-    public Foo(FooCreateDto dto)
+    public Boo(BooCreateDto dto)
     {
         this.Name = dto.Name;
         this.Description = dto.Description;
     }
 
-    public Foo(FooUpdateDto dto)
+    public Boo(BooUpdateDto dto)
     {
         this.Id = dto.Id;
         this.Name = dto.Name;
@@ -34,9 +31,9 @@ public class Foo : IGuidEntity, ITimeStampsUnix, ISoftDeleteUnix
     [StringLength(191)]
     public string? Description { get; set; }
 
-    public long CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
-    public long UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 
-    public long? DeletedAt { get; set; }
+    public DateTime? DeletedAt { get; set; }
 }

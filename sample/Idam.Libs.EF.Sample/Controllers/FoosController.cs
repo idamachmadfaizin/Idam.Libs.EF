@@ -29,7 +29,7 @@ public class FoosController : ControllerBase
         return await _context.Foos.ToListAsync();
     }
 
-    // GET: api/Foos/5
+    // GET: api/Foos/289c9eaa-3f35-4462-064a-08db6654a8e7
     [HttpGet("{id}")]
     public async Task<ActionResult<Foo>> GetFoo(Guid id)
     {
@@ -47,17 +47,17 @@ public class FoosController : ControllerBase
         return foo;
     }
 
-    // PUT: api/Foos/5
+    // PUT: api/Foos/289c9eaa-3f35-4462-064a-08db6654a8e7
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutFoo(Guid id, FooUpdateDto foo)
+    public async Task<IActionResult> PutFoo(Guid id, FooUpdateDto fooDto)
     {
-        if (id != foo.Id)
+        if (id != fooDto.Id)
         {
             return BadRequest();
         }
 
-        _context.Entry(foo).State = EntityState.Modified;
+        _context.Entry(fooDto).State = EntityState.Modified;
 
         try
         {
@@ -96,7 +96,7 @@ public class FoosController : ControllerBase
         return CreatedAtAction(nameof(GetFoo), new { id = foo.Id }, foo);
     }
 
-    // DELETE: api/Foos/5
+    // DELETE: api/Foos/289c9eaa-3f35-4462-064a-08db6654a8e7
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteFoo(Guid id)
     {
@@ -130,7 +130,7 @@ public class FoosController : ControllerBase
             .ToListAsync();
     }
 
-    // GET: api/Foos/deleted/5
+    // GET: api/Foos/deleted/289c9eaa-3f35-4462-064a-08db6654a8e7
     [HttpGet("deleted/{id}")]
     public async Task<ActionResult<Foo>> GetDeletedFoo(Guid id)
     {
@@ -152,7 +152,7 @@ public class FoosController : ControllerBase
         return foo;
     }
 
-    // PUT: api/Foos/restore/5
+    // PUT: api/Foos/restore/289c9eaa-3f35-4462-064a-08db6654a8e7
     [HttpPut("restore/{id}")]
     public async Task<IActionResult> RestoreFoo(Guid id)
     {
