@@ -1,27 +1,18 @@
 # Idam.Libs.EF
-
-Idam.Libs.EF is .Net Core (C#) for Entity Framework (EF) Utils.
-
-<br/>
+[Idam.Libs.EF](https://github.com/idamachmadfaizin/Idam.Libs.EF) is .Net Core (C#) for Entity Framework (EF) Utils.
 
 ## Give a Star! :star:
 If you like or are using this project please give it a star. Thanks!
 
-<br/>
-
 ## Features:
+- Soft delete (CreatedAt).
+- Timestamps (CreatedAt, UpdatedAt).
 
-- Soft delete
-- Timestamps (CreatedAt, UpdatedAt),
+Both features support DateTime and [Unix Time Milliseconds](https://learn.microsoft.com/en-us/dotnet/api/system.datetimeoffset.tounixtimemilliseconds?view=net-7.0) format.
 
-    The Timestamps used a [Unix Time Milliseconds](https://learn.microsoft.com/en-us/dotnet/api/system.datetimeoffset.tounixtimemilliseconds?view=net-7.0) format, also known as Epoch Time or POSIX timestamp. 
-    
-    example: [currentmillis](https://currentmillis.com)
-
-<br/>
+Example of Unix Time Milliseconds: [currentmillis](https://currentmillis.com)
 
 ## Get started
-
 run this command to install
 
 ```
@@ -31,8 +22,6 @@ or
 ```
 dotnet tool install Idam.Libs.EF
 ```
-
-<br/>
 
 ## Usage
 ### Using Timestamps
@@ -58,11 +47,23 @@ public class MyDbContext : DbContext
 }
 ```
 
-2. Implement the `ITimeStamps` to your entity.
+2. Implement a Interface (`ITimeStamps` or `ITimeStampsUnix`) to your entity.
+
 ```cs
 using Idam.Libs.EF.Interfaces;
 
-public class Foo : ITimeStamps
+// Using DateTime Format
+public class Boo : ITimeStamps
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = default!;
+    public string? Description { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+
+// Using Unix Format
+public class Foo : ITimeStampsUnix
 {
     public int Id { get; set; }
     public string Name { get; set; } = default!;
@@ -71,8 +72,6 @@ public class Foo : ITimeStamps
     public long UpdatedAt { get; set; }
 }
 ```
-
-<br/>
 
 ### Using SoftDelete
 
@@ -105,11 +104,22 @@ public class MyDbContext : DbContext
 }
 ```
 
-2. Implement `ISoftDelete` to your entity.
+2. Implement a Interface (`ISoftDelete` or `ISoftDeleteUnix`) to your entity.
+
 ```cs
 using Idam.Libs.EF.Interfaces;
 
-public class Foo : ISoftDelete
+// Using DateTime Format
+public class Boo : ISoftDelete
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = default!;
+    public string? Description { get; set; }
+    public DateTime? DeletedAt { get; set; }
+}
+
+// Using Unix Format
+public class Foo : ISoftDeleteUnix
 {
     public int Id { get; set; }
     public string Name { get; set; } = default!;
@@ -118,10 +128,10 @@ public class Foo : ISoftDelete
 }
 ```
 
-<br/>
-
-The softdelete has restore function, So you can restore the deleted data, see below.
+The softdelete has restore function, so you can restore the deleted data, see below.
 ```cs
+using Idam.Libs.EF.Extensions;
+
 /// Your context
 public class MyDbContext : DbContext
 {
@@ -158,8 +168,6 @@ public class FooController
     }
 }
 ```
-
-<br/>
 
 ### Using IGuidEntity
 An Interface to implement Id as Guid instead of int.
