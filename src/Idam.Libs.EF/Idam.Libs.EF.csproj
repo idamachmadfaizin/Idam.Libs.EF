@@ -8,14 +8,20 @@
 		<Authors>Idamachmadfaizin</Authors>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>Softdelete;Timestamps</PackageTags>
-		<PackageReleaseNotes>First release</PackageReleaseNotes>
+		<PackageReleaseNotes>Add .net 6 support</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/idamachmadfaizin/Idam.Libs.EF</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/idamachmadfaizin/Idam.Libs.EF</RepositoryUrl>
 		<Description>Idam.Libs.EF is .Net Core (C#) for Entity Framework (EF) Utils.
 Features: Soft delete (DeletedAt) as unix, Timestamps (CreatedAt, UpdatedAt) as unix</Description>
+		<Version>1.0.1</Version>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Include="..\..\LICENSE.txt">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	  <None Include="..\..\README.md">
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>

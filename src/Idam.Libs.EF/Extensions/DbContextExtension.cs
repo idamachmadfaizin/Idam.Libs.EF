@@ -31,31 +31,51 @@ public static class DbContextExtension
     {
         if (entityEntry == null) return;
 
-        // current datetime in unix format
-        var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        // current datetime
+        var nowUnix = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        var now = DateTime.Now;
 
-        if (entityEntry.Entity is ITimeStamps timeStamps)
+        switch (entityEntry.State)
         {
-            switch (entityEntry.State)
-            {
-                case EntityState.Modified:
-                    timeStamps.UpdatedAt = now;
-                    break;
+            case EntityState.Modified:
+                if (entityEntry.Entity is ITimeStamps timeStampsModified)
+                {
+                    timeStampsModified.UpdatedAt = now;
+                }
+                else if (entityEntry.Entity is ITimeStampsUnix timeStampsUnix)
+                {
+                    timeStampsUnix.UpdatedAt = nowUnix;
+                }
+                break;
 
-                case EntityState.Added:
-                    timeStamps.CreatedAt = now;
-                    timeStamps.UpdatedAt = now;
-                    break;
+            case EntityState.Added:
+                if (entityEntry.Entity is ITimeStamps timeStampsAdded)
+                {
+                    timeStampsAdded.CreatedAt = now;
+                    timeStampsAdded.UpdatedAt = now;
+                }
+                else if (entityEntry.Entity is ITimeStampsUnix timeStampsUnix)
+                {
+                    timeStampsUnix.CreatedAt = nowUnix;
+                    timeStampsUnix.UpdatedAt = nowUnix;
+                }
+                break;
 
-                default:
-                    break;
-            }
-        }
+            case EntityState.Deleted:
+                entityEntry.State = EntityState.Modified;
 
-        if (entityEntry.Entity is ISoftDelete softDelete && entityEntry.State == EntityState.Deleted)
-        {
-            entityEntry.State = EntityState.Modified;
-            softDelete.DeletedAt = now;
+                if (entityEntry.Entity is ISoftDelete softDelete)
+                {
+                    softDelete.DeletedAt = now;
+                }
+                else if (entityEntry.Entity is ISoftDeleteUnix softDeleteUnix)
+                {
+                    softDeleteUnix.DeletedAt = nowUnix;
+                }
+                break;
+
+            default:
+                break;
         }
     }
 
@@ -66,7 +86,12 @@ public static class DbContextExtension
     /// <param name="mutable"></param>
     public static void AddSoftDeleteFilter(this ModelBuilder builder, IMutableEntityType? mutable)
     {
-        if (mutable is not null && typeof(ISoftDelete).IsAssignableFrom(mutable.ClrType))
+        if (mutable is null)
+        {
+            return;
+        }
+
+        if (typeof(ISoftDelete).IsAssignableFrom(mutable.ClrType) || typeof(ISoftDeleteUnix).IsAssignableFrom(mutable.ClrType))
         {
             var parameter = Expression.Parameter(mutable.ClrType, "e");
             var body = Expression.Equal(
@@ -103,12 +128,26 @@ public static class DbContextExtension
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
     public static TEntity Restore<TEntity>(this DbSet<TEntity> dbSet, TEntity entity)
-        where TEntity : class, ISoftDelete
+        where TEntity : class, ISoftDeleteBase
     {
-        if (dbSet is null) throw new ArgumentNullException(nameof(dbSet));
+        if (dbSet is null)
+        {
+            throw new ArgumentNullException(nameof(dbSet));
+        }
+        if (entity is not ISoftDeleteBase)
+        {
+            throw new ArgumentException($"{nameof(entity)} must be ISoftDelete or ISoftDeleteUnix");
+        }
 
-        if (entity is not null and ISoftDelete)
-            entity.DeletedAt = null;
-        return entity!;
+        if (entity is ISoftDelete softDelete)
+        {
+            softDelete.DeletedAt = null;
+        }
+        else if (entity is ISoftDeleteUnix softDeleteUnix)
+        {
+            softDeleteUnix.DeletedAt = null;
+        }
+
+        return entity;
     }
 }

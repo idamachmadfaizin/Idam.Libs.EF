@@ -3,8 +3,8 @@
 /// <summary>
 /// Timestamps interface using unix format
 /// </summary>
-public interface ITimeStamps
+public interface ITimeStampsUnix
 {
-    DateTime CreatedAt { get; set; }
-    DateTime UpdatedAt { get; set; }
+    long CreatedAt { get; set; }
+    long UpdatedAt { get; set; }
 }
