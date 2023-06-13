@@ -33,7 +33,7 @@ public static class DbContextExtension
 
         // current datetime
         var nowUnix = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
 
         switch (entityEntry.State)
         {
