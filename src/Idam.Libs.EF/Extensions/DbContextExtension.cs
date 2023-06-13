@@ -29,7 +29,7 @@ public static class DbContextExtension
     /// <param name="entityEntry"></param>
     public static void AddTimestamps(this EntityEntry? entityEntry)
     {
-        if (entityEntry == null) return;
+        if (entityEntry is null) return;
 
         // current datetime
         var nowUnix = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -62,14 +62,14 @@ public static class DbContextExtension
                 break;
 
             case EntityState.Deleted:
-                entityEntry.State = EntityState.Modified;
-
-                if (entityEntry.Entity is ISoftDelete softDelete)
+                if (entityEntry.Entity is ISoftDelete softDelete && softDelete.DeletedAt is null)
                 {
+                    entityEntry.State = EntityState.Modified;
                     softDelete.DeletedAt = now;
                 }
-                else if (entityEntry.Entity is ISoftDeleteUnix softDeleteUnix)
+                else if (entityEntry.Entity is ISoftDeleteUnix softDeleteUnix && softDeleteUnix.DeletedAt is null)
                 {
+                    entityEntry.State = EntityState.Modified;
                     softDeleteUnix.DeletedAt = nowUnix;
                 }
                 break;

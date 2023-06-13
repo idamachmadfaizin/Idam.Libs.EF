@@ -178,6 +178,8 @@ public class FooController
 }
 ```
 
+> You can permanently delete data that has DeletedAt value.
+
 ### Using IGuidEntity
 
 An Interface to implement Id as Guid instead of int.
