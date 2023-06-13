@@ -15,20 +15,19 @@ public class MyDbContext : DbContext
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
-        ChangeTracker.Entries().AddTimestamps();
+        ChangeTracker.AddTimestamps();
         return base.SaveChanges(acceptAllChangesOnSuccess);
     }
 
     public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
-        ChangeTracker.Entries().AddTimestamps();
+        ChangeTracker.AddTimestamps();
         return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        var entityTypes = modelBuilder.Model.GetEntityTypes();
-        modelBuilder.AddSoftDeleteFilter(entityTypes);
+        modelBuilder.AddSoftDeleteFilter();
 
         base.OnModelCreating(modelBuilder);
     }

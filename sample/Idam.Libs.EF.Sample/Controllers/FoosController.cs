@@ -106,8 +106,7 @@ public class FoosController : ControllerBase
         }
 
         var foo = await _context.Foos.IgnoreQueryFilters()
-            .Where(b => b.Id.Equals(id))
-            .FirstOrDefaultAsync();
+            .FindAsync(b => b.Id.Equals(id));
 
         if (foo is null || (foo.DeletedAt is not null && permanent.Equals(false)))
         {

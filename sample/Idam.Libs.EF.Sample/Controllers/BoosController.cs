@@ -106,8 +106,7 @@ namespace Idam.Libs.EF.Sample.Controllers
             }
 
             var boo = await _context.Boos.IgnoreQueryFilters()
-                    .Where(b => b.Id.Equals(id))
-                    .FirstOrDefaultAsync();
+                .FindAsync(b => b.Id.Equals(id));
 
             if (boo is null || (boo.DeletedAt is not null && permanent.Equals(false)))
             {
