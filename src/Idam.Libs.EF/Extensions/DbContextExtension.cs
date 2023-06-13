@@ -14,10 +14,10 @@ public static class DbContextExtension
     /// <summary>
     /// Add Unix timestamps to the TimeStamps Entity when state is Added or Modified or Deleted
     /// </summary>
-    /// <param name="entityEntries"></param>
-    public static void AddTimestamps(this IEnumerable<EntityEntry> entityEntries)
+    /// <param name="changeTracker"></param>
+    public static void AddTimestamps(this ChangeTracker changeTracker)
     {
-        foreach (var entityEntry in entityEntries)
+        foreach (var entityEntry in changeTracker.Entries())
         {
             AddTimestamps(entityEntry);
         }
@@ -27,7 +27,7 @@ public static class DbContextExtension
     /// Add Unix timestamps to the TimeStamps Entity when state is Added or Modified or Deleted
     /// </summary>
     /// <param name="entityEntry"></param>
-    public static void AddTimestamps(this EntityEntry? entityEntry)
+    private static void AddTimestamps(this EntityEntry? entityEntry)
     {
         if (entityEntry is null) return;
 
@@ -83,8 +83,25 @@ public static class DbContextExtension
     /// Query Filter to get model where DeletedAt not null
     /// </summary>
     /// <param name="builder"></param>
+    public static void AddSoftDeleteFilter(this ModelBuilder builder)
+    {
+        var mutables = builder.Model.GetEntityTypes();
+
+        if (mutables is not null)
+        {
+            foreach (var mutable in mutables)
+            {
+                builder.AddSoftDeleteFilter(mutable);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Query Filter to get model where DeletedAt not null
+    /// </summary>
+    /// <param name="builder"></param>
     /// <param name="mutable"></param>
-    public static void AddSoftDeleteFilter(this ModelBuilder builder, IMutableEntityType? mutable)
+    private static void AddSoftDeleteFilter(this ModelBuilder builder, IMutableEntityType? mutable)
     {
         if (mutable is null)
         {
@@ -101,53 +118,5 @@ public static class DbContextExtension
 
             builder.Entity(mutable.ClrType).HasQueryFilter(expression);
         }
-    }
-
-    /// <summary>
-    /// Query Filter to get model where DeletedAt not null
-    /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="mutables"></param>
-    public static void AddSoftDeleteFilter(this ModelBuilder builder, IEnumerable<IMutableEntityType>? mutables)
-    {
-        if (mutables is not null)
-        {
-            foreach (var mutable in mutables)
-            {
-                builder.AddSoftDeleteFilter(mutable);
-            }
-        }
-    }
-
-    /// <summary>
-    /// DbSet extension to restore deleted data
-    /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    /// <param name="dbSet"></param>
-    /// <param name="entity"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
-    public static TEntity Restore<TEntity>(this DbSet<TEntity> dbSet, TEntity entity)
-        where TEntity : class, ISoftDeleteBase
-    {
-        if (dbSet is null)
-        {
-            throw new ArgumentNullException(nameof(dbSet));
-        }
-        if (entity is not ISoftDeleteBase)
-        {
-            throw new ArgumentException($"{nameof(entity)} must be ISoftDelete or ISoftDeleteUnix");
-        }
-
-        if (entity is ISoftDelete softDelete)
-        {
-            softDelete.DeletedAt = null;
-        }
-        else if (entity is ISoftDeleteUnix softDeleteUnix)
-        {
-            softDeleteUnix.DeletedAt = null;
-        }
-
-        return entity;
     }
 }
