@@ -22,7 +22,7 @@ public class FoosController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Foo>>> GetFoos()
     {
-        if (_context.Foos == null)
+        if (_context.Foos is null)
         {
             return NotFound();
         }
@@ -33,13 +33,13 @@ public class FoosController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<Foo>> GetFoo(Guid id)
     {
-        if (_context.Foos == null)
+        if (_context.Foos is null)
         {
             return NotFound();
         }
         var foo = await _context.Foos.FindAsync(id);
 
-        if (foo == null)
+        if (foo is null)
         {
             return NotFound();
         }
@@ -83,7 +83,7 @@ public class FoosController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Foo>> PostFoo(FooCreateDto fooDto)
     {
-        if (_context.Foos == null)
+        if (_context.Foos is null)
         {
             return Problem("Entity set 'MyDbContext.Foos'  is null.");
         }
@@ -98,14 +98,18 @@ public class FoosController : ControllerBase
 
     // DELETE: api/Foos/289c9eaa-3f35-4462-064a-08db6654a8e7
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteFoo(Guid id)
+    public async Task<IActionResult> DeleteFoo(Guid id, [FromQuery] bool permanent = false)
     {
-        if (_context.Foos == null)
+        if (_context.Foos is null)
         {
             return NotFound();
         }
-        var foo = await _context.Foos.FindAsync(id);
-        if (foo == null)
+
+        var foo = await _context.Foos.IgnoreQueryFilters()
+            .Where(b => b.Id.Equals(id))
+            .FirstOrDefaultAsync();
+
+        if (foo is null || (foo.DeletedAt is not null && permanent.Equals(false)))
         {
             return NotFound();
         }
@@ -120,10 +124,11 @@ public class FoosController : ControllerBase
     [HttpGet("deleted")]
     public async Task<ActionResult<IEnumerable<Foo>>> GetDeletedFoos()
     {
-        if (_context.Foos == null)
+        if (_context.Foos is null)
         {
             return NotFound();
         }
+
         return await _context.Foos
             .IgnoreQueryFilters()
             .Where(w => w.DeletedAt != null)
@@ -134,17 +139,18 @@ public class FoosController : ControllerBase
     [HttpGet("deleted/{id}")]
     public async Task<ActionResult<Foo>> GetDeletedFoo(Guid id)
     {
-        if (_context.Foos == null)
+        if (_context.Foos is null)
         {
             return NotFound();
         }
+
         var foo = await _context.Foos
             .IgnoreQueryFilters()
             .Where(w => w.Id == id)
             .Where(w => w.DeletedAt != null)
             .FirstOrDefaultAsync();
 
-        if (foo == null)
+        if (foo is null)
         {
             return NotFound();
         }
@@ -161,7 +167,8 @@ public class FoosController : ControllerBase
             .Where(w => w.Id == id)
             .Where(w => w.DeletedAt != null)
             .FirstOrDefaultAsync();
-        if (entity == null)
+
+        if (entity is null)
         {
             return NotFound();
         }

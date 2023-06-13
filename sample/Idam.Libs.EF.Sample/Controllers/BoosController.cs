@@ -22,7 +22,7 @@ namespace Idam.Libs.EF.Sample.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Boo>>> GetBoos()
         {
-            if (_context.Boos == null)
+            if (_context.Boos is null)
             {
                 return NotFound();
             }
@@ -33,13 +33,13 @@ namespace Idam.Libs.EF.Sample.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Boo>> GetBoo(Guid id)
         {
-            if (_context.Boos == null)
+            if (_context.Boos is null)
             {
                 return NotFound();
             }
             var boo = await _context.Boos.FindAsync(id);
 
-            if (boo == null)
+            if (boo is null)
             {
                 return NotFound();
             }
@@ -83,7 +83,7 @@ namespace Idam.Libs.EF.Sample.Controllers
         [HttpPost]
         public async Task<ActionResult<Boo>> PostBoo(BooCreateDto booDto)
         {
-            if (_context.Boos == null)
+            if (_context.Boos is null)
             {
                 return Problem("Entity set 'MyDbContext.Boos'  is null.");
             }
@@ -98,14 +98,18 @@ namespace Idam.Libs.EF.Sample.Controllers
 
         // DELETE: api/Boos/289c9eaa-3f35-4462-064a-08db6654a8e7
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteBoo(Guid id)
+        public async Task<IActionResult> DeleteBoo(Guid id, [FromQuery] bool permanent = false)
         {
-            if (_context.Boos == null)
+            if (_context.Boos is null)
             {
                 return NotFound();
             }
-            var boo = await _context.Boos.FindAsync(id);
-            if (boo == null)
+
+            var boo = await _context.Boos.IgnoreQueryFilters()
+                    .Where(b => b.Id.Equals(id))
+                    .FirstOrDefaultAsync();
+
+            if (boo is null || (boo.DeletedAt is not null && permanent.Equals(false)))
             {
                 return NotFound();
             }
@@ -120,7 +124,7 @@ namespace Idam.Libs.EF.Sample.Controllers
         [HttpGet("deleted")]
         public async Task<ActionResult<IEnumerable<Boo>>> GetDeletedBoos()
         {
-            if (_context.Boos == null)
+            if (_context.Boos is null)
             {
                 return NotFound();
             }
@@ -134,7 +138,7 @@ namespace Idam.Libs.EF.Sample.Controllers
         [HttpGet("deleted/{id}")]
         public async Task<ActionResult<Boo>> GetDeletedBoo(Guid id)
         {
-            if (_context.Boos == null)
+            if (_context.Boos is null)
             {
                 return NotFound();
             }
@@ -144,7 +148,7 @@ namespace Idam.Libs.EF.Sample.Controllers
                 .Where(w => w.DeletedAt != null)
                 .FirstOrDefaultAsync();
 
-            if (foo == null)
+            if (foo is null)
             {
                 return NotFound();
             }
@@ -161,7 +165,7 @@ namespace Idam.Libs.EF.Sample.Controllers
                 .Where(w => w.Id == id)
                 .Where(w => w.DeletedAt != null)
                 .FirstOrDefaultAsync();
-            if (entity == null)
+            if (entity is null)
             {
                 return NotFound();
             }
