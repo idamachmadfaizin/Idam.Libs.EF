@@ -1,6 +1,5 @@
 ﻿using Idam.Libs.EF.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace Idam.Libs.EF.Extensions;
 public static class DbSetExtension
@@ -36,32 +35,5 @@ public static class DbSetExtension
         }
 
         return entity;
-    }
-
-    /// <summary>
-    /// Extension to use FindAsync() from IQueryable
-    /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    /// <param name="source"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public static Task<TEntity?> FindAsync<TEntity>(this IQueryable<TEntity> source, CancellationToken cancellationToken = default)
-        where TEntity : class
-    {
-        return source.FirstOrDefaultAsync(cancellationToken);
-    }
-
-    /// <summary>
-    /// Extension to use FindAsync() from IQueryable
-    /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    /// <param name="source"></param>
-    /// <param name="predicate"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public static Task<TEntity?> FindAsync<TEntity>(this IQueryable<TEntity> source, Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
-        where TEntity : class
-    {
-        return source.FirstOrDefaultAsync(predicate, cancellationToken);
     }
 }

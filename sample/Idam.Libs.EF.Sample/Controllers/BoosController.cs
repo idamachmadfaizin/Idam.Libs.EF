@@ -98,7 +98,7 @@ namespace Idam.Libs.EF.Sample.Controllers
 
         // DELETE: api/Boos/289c9eaa-3f35-4462-064a-08db6654a8e7
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteBoo(Guid id, [FromQuery] bool permanent = false)
+        public async Task<IActionResult> DeleteBoo(Guid id)
         {
             if (_context.Boos is null)
             {
@@ -106,9 +106,9 @@ namespace Idam.Libs.EF.Sample.Controllers
             }
 
             var boo = await _context.Boos.IgnoreQueryFilters()
-                .FindAsync(b => b.Id.Equals(id));
+                .FirstOrDefaultAsync(b => b.Id.Equals(id));
 
-            if (boo is null || (boo.DeletedAt is not null && permanent.Equals(false)))
+            if (boo is null)
             {
                 return NotFound();
             }
