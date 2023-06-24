@@ -8,7 +8,7 @@ on:
   #    - 'v*'
 
 env:
-  dotnetVersion: '7.0.x'
+  dotnetVersion: 7.0.x
   testProjectPath: test/Idam.Libs.EF.Tests
   srcProjectPath: src/Idam.Libs.EF
 
