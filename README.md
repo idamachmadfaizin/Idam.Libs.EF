@@ -1,5 +1,7 @@
 # Idam.Libs.EF
 
+[![NuGet](https://img.shields.io/nuget/v/Idam.Libs.EF.svg)](https://www.nuget.org/packages/Idam.Libs.EF) [![.NET](https://github.com/ronnygunawan/RG.RazorMail/actions/workflows/CI.yml/badge.svg)](https://github.com/ronnygunawan/RG.RazorMail/actions/workflows/CI.yml)
+
 [Idam.Libs.EF](https://github.com/idamachmadfaizin/Idam.Libs.EF) is .Net Core (C#) for Entity Framework (EF) Utils.
 
 ## Give a Star! :star:
@@ -42,13 +44,13 @@ dotnet tool install Idam.Libs.EF
     {
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
-            ChangeTracker.Entries().AddTimestamps();
+            ChangeTracker.AddTimestamps();
             return base.SaveChanges(acceptAllChangesOnSuccess);
         }
 
         public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {
-            ChangeTracker.Entries().AddTimestamps();
+            ChangeTracker.AddTimestamps();
             return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
     }
@@ -59,7 +61,7 @@ dotnet tool install Idam.Libs.EF
     ```cs
     using Idam.Libs.EF.Interfaces;
 
-    // Using DateTime Format
+    /// Using DateTime Format
     public class Boo : ITimeStamps
     {
         public int Id { get; set; }
@@ -69,7 +71,7 @@ dotnet tool install Idam.Libs.EF
         public DateTime UpdatedAt { get; set; }
     }
 
-    // Using Unix Format
+    /// Using Unix Format
     public class Foo : ITimeStampsUnix
     {
         public int Id { get; set; }
@@ -91,20 +93,19 @@ dotnet tool install Idam.Libs.EF
     {
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
-            ChangeTracker.Entries().AddTimestamps();
+            ChangeTracker.AddTimestamps();
             return base.SaveChanges(acceptAllChangesOnSuccess);
         }
 
         public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {
-            ChangeTracker.Entries().AddTimestamps();
+            ChangeTracker.AddTimestamps();
             return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var entityTypes = modelBuilder.Model.GetEntityTypes();
-            modelBuilder.AddSoftDeleteFilter(entityTypes);
+            modelBuilder.AddSoftDeleteFilter();
 
             base.OnModelCreating(modelBuilder);
         }
@@ -116,7 +117,7 @@ dotnet tool install Idam.Libs.EF
     ```cs
     using Idam.Libs.EF.Interfaces;
 
-    // Using DateTime Format
+    /// Using DateTime Format
     public class Boo : ISoftDelete
     {
         public int Id { get; set; }
@@ -125,7 +126,7 @@ dotnet tool install Idam.Libs.EF
         public DateTime? DeletedAt { get; set; }
     }
 
-    // Using Unix Format
+    /// Using Unix Format
     public class Foo : ISoftDeleteUnix
     {
         public int Id { get; set; }
@@ -178,7 +179,7 @@ public class FooController
 }
 ```
 
-> You can permanently delete data that has DeletedAt value.
+> You can permanently delete data that has a DeletedAt value.
 
 ### Using IGuidEntity
 
@@ -194,3 +195,30 @@ public class Foo : IGuidEntity
     public string? Description { get; set; }
 }
 ```
+
+## Migrating
+Migrating from 2.0.1
+
+1. If you implements ITimeStamps and/or ISoftDelete in your entities before, update your CreatedAt and UpdatedAt to UTC datetime.
+2. Update DbContext
+
+	Inside SaveChanges() and SaveChangesAsync()
+
+    ```cs
+    /// before
+    ChangeTracker.Entries().AddTimestamps();
+
+    /// to
+    ChangeTracker.AddTimestamps();
+    ```
+
+	Inside OnModelCreating()
+
+    ```cs
+	/// before
+	var entityTypes = modelBuilder.Model.GetEntityTypes();
+    modelBuilder.AddSoftDeleteFilter(entityTypes);
+
+    /// to
+    modelBuilder.AddSoftDeleteFilter();
+    ```

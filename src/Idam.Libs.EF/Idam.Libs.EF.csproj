@@ -8,14 +8,17 @@
 		<Authors>Idamachmadfaizin</Authors>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>Softdelete;Timestamps</PackageTags>
-		<PackageReleaseNotes>Add DateTime support</PackageReleaseNotes>
+		<PackageReleaseNotes>- Use UtcNow for DateTime type
+- Add Permanent Delete
+- Simplify AddTimestamps() in DbContext
+- fix softdelete query filter</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/idamachmadfaizin/Idam.Libs.EF</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/idamachmadfaizin/Idam.Libs.EF</RepositoryUrl>
 		<Description>Idam.Libs.EF is .Net Core (C#) for Entity Framework (EF) Utils.
 Features: 
 - Soft delete (DeletedAt) as unix or DateTime
 - Timestamps (CreatedAt, UpdatedAt) as unix or DateTime</Description>
-		<Version>2.0.1</Version>
+		<Version>2.1.0</Version>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	</PropertyGroup>
 
