@@ -5,7 +5,7 @@ on:
       - 6-create-gh-action-to-publish-to-nugetcom
   #push:
   #  tags:
-  #    - '*'
+  #    - 'v*'
 
 jobs:
   build:
@@ -18,13 +18,33 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '7.0.x'  # Change to the appropriate version
+          dotnet-version: '7.0.x'
 
       - name: Restore dependencies
         run: dotnet restore
 
       - name: Build library
         run: dotnet build --configuration Release --no-restore
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ needs.build.result == 'success' }}
+
+    steps:
+      #- name: Checkout repository
+      #  uses: actions/checkout@v2
+
+      #- name: Setup .NET
+      #  uses: actions/setup-dotnet@v1
+      #  with:
+      #    dotnet-version: '7.0.x'
+
+      #- name: Restore dependencies
+      #  run: dotnet restore
+
+      #- name: Build library
+      #  run: dotnet build --configuration Release --no-restore
 
       - name: Pack NuGet package
         run: dotnet pack --configuration Release --no-build --output ./output
