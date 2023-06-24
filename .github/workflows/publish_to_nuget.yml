@@ -32,8 +32,8 @@ jobs:
     if: ${{ needs.build.result == 'success' }}
 
     steps:
-      #- name: Checkout repository
-      #  uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
       #- name: Setup .NET
       #  uses: actions/setup-dotnet@v1
