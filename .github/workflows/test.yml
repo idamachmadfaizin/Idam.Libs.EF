@@ -4,6 +4,7 @@ on: [push]
 env:
   dotnetVersion: 7.0.x
   testProjectPath: test/Idam.Libs.EF.Tests
+  srcProjectPath: src/Idam.Libs.EF
 
 jobs:
   test:
@@ -28,11 +29,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget
 
-      - name: Restore dependencies 
+      - name: Restore Idam.Libs.EF dependencies
+        run: dotnet restore ${{ env.srcProjectPath }}
+
+      - name: Build Idam.Libs.EF library
+        run: dotnet build ${{ env.srcProjectPath }} --configuration Release --no-restore
+
+      - name: Test Idam.Libs.EF
+        run: dotnet test ${{ env.srcProjectPath }} --no-restore --no-build --verbosity normal
+
+      - name: Restore Idam.Libs.EF.Tests dependencies 
         run: dotnet restore ${{ env.testProjectPath }}
 
-      - name: Build library
+      - name: Build Idam.Libs.EF.Tests library
         run: dotnet build ${{ env.testProjectPath }} --configuration Release --no-restore
 
-      - name: Test
-        run: dotnet test ${{ env.testProjectPath }} --no-restore --verbosity normal
+      - name: Test Idam.Libs.EF.Tests
+        run: dotnet test ${{ env.testProjectPath }} --no-restore --no-build --verbosity normal
