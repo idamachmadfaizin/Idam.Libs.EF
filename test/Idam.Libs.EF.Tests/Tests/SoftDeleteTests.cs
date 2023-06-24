@@ -17,6 +17,17 @@ public class SoftDeleteTests : BaseTest
     }
 
     [Fact]
+    public async Task DateTimeSoftDeleteFilter()
+    {
+        var data = await this.AddAsync(_booFaker.Generate());
+        data = await this.DeleteAsync(data);
+
+        var dataFromDb = await _context.Boos.FirstOrDefaultAsync(x => x.Id.Equals(data.Id));
+
+        Assert.Null(dataFromDb);
+    }
+
+    [Fact]
     public async Task DateTimeRestore()
     {
         var data = await this.AddAsync(_booFaker.Generate());
@@ -46,7 +57,7 @@ public class SoftDeleteTests : BaseTest
         data = await this.DeleteAsync(data);
         data = await this.DeleteAsync(data);
 
-        var dataFromDb = await _context.Boos.FindAsync(data.Id);
+        var dataFromDb = await _context.Boos.FirstOrDefaultAsync(x => x.Id.Equals(data.Id));
         Assert.Null(dataFromDb);
     }
 
@@ -56,10 +67,21 @@ public class SoftDeleteTests : BaseTest
         var data = await this.AddAsync(_fooFaker.Generate());
         data = await this.DeleteAsync(data);
 
-        var dataFromDb = await _context.Foos.FindAsync(data.Id);
+        var dataFromDb = await _context.Foos.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id.Equals(data.Id));
 
         Assert.NotNull(dataFromDb);
         Assert.NotNull(dataFromDb.DeletedAt);
+    }
+
+    [Fact]
+    public async Task UnixSoftDeleteFilter()
+    {
+        var data = await this.AddAsync(_fooFaker.Generate());
+        data = await this.DeleteAsync(data);
+
+        var dataFromDb = await _context.Foos.FirstOrDefaultAsync(x => x.Id.Equals(data.Id));
+
+        Assert.Null(dataFromDb);
     }
 
     [Fact]
@@ -69,7 +91,7 @@ public class SoftDeleteTests : BaseTest
         data = await this.DeleteAsync(data);
         data = await this.DeleteAsync(data);
 
-        var dataFromDb = await _context.Foos.FindAsync(data.Id);
+        var dataFromDb = await _context.Foos.FirstOrDefaultAsync(x => x.Id.Equals(data.Id));
 
         Assert.Null(dataFromDb);
     }
