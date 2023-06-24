@@ -61,7 +61,7 @@ jobs:
         run: dotnet pack ${{ env.srcProjectPath }} --configuration Release
 
       - name: Echo package output
-        run: ls ./${{ env.srcProjectPath }}/bin/Release
+        run: ls ${{ github.workspace }}/${{ env.srcProjectPath }}/bin/Release
 
       # - name: Publish to NuGet.org
       #   run: dotnet nuget push ${{ env.srcProjectPath }}/output/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
