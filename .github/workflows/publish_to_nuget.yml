@@ -21,10 +21,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup .NET Core SDK $dotnetVersion
+      - name: Setup .NET Core SDK ${dotnetVersion}
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: $dotnetVersion
+          dotnet-version: ${dotnetVersion}
 
       - name: Restore dependencies 
         run: dotnet restore test/Idam.Libs.EF.Tests
