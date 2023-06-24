@@ -41,7 +41,7 @@ jobs:
         run: dotnet build ${{ env.testProjectPath }} --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test ${{ env.testProjectPath }} --no-restore --no-build --verbosity normal
+        run: dotnet test ${{ env.testProjectPath }} --no-restore --verbosity normal
 
   publish:
     name: "Build, Pack, and Publish package to NuGet.org"
@@ -75,7 +75,7 @@ jobs:
         run: dotnet build ${{ env.srcProjectPath }} --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test ${{ env.srcProjectPath }} --no-restore --no-build --verbosity normal
+        run: dotnet test ${{ env.srcProjectPath }} --no-restore --verbosity normal
 
       - name: Pack NuGet package
         run: dotnet pack ${{ env.srcProjectPath }} --configuration Release
