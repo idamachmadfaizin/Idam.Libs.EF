@@ -27,13 +27,13 @@ jobs:
           dotnet-version: ${{ env.dotnetVersion }}
 
       - name: Restore dependencies 
-        run: dotnet restore test/Idam.Libs.EF.Tests
+        run: dotnet restore ${{ env.testProjectPath }}
 
       - name: Build library
-        run: dotnet build test/Idam.Libs.EF.Tests --configuration Release --no-restore
+        run: dotnet build ${{ env.testProjectPath }} --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test --no-restore --verbosity normal
+        run: dotnet test ${{ env.testProjectPath }} --no-restore --verbosity normal
 
   publish:
     name: "Build, Pack, and Publish package to NuGet.org"
@@ -46,19 +46,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup .NET Core SDK $dotnetVersion
+      - name: Setup .NET Core SDK ${{ env.dotnetVersion }}
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: $dotnetVersion
+          dotnet-version: ${{ env.dotnetVersion }}
 
       - name: Restore dependencies
-        run: dotnet restore src/Idam.Libs.EF
+        run: dotnet restore ${{ env.srcProjectPath }}
 
       - name: Build library
-        run: dotnet build src/Idam.Libs.EF --configuration Release --no-restore
+        run: dotnet build ${{ env.srcProjectPath }} --configuration Release --no-restore
 
       - name: Pack NuGet package
-        run: dotnet pack src/Idam.Libs.EF --configuration Release --no-build --output ./output
+        run: dotnet pack ${{ env.srcProjectPath }} --configuration Release --no-build --output ./output
 
-      - name: Publish to NuGet.org
-        run: dotnet nuget push ./output/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      - name: Echo package output
+        run: ls ${{ env.srcProjectPath }}/output/
+
+      # - name: Publish to NuGet.org
+      #   run: dotnet nuget push ${{ env.srcProjectPath }}/output/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
