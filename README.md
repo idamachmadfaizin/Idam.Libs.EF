@@ -1,6 +1,6 @@
 # Idam.Libs.EF
 
-[![NuGet](https://img.shields.io/nuget/v/Idam.Libs.EF.svg)](https://www.nuget.org/packages/Idam.Libs.EF) [![.NET](https://github.com/ronnygunawan/RG.RazorMail/actions/workflows/CI.yml/badge.svg)](https://github.com/ronnygunawan/RG.RazorMail/actions/workflows/CI.yml)
+[![NuGet](https://img.shields.io/nuget/v/Idam.Libs.EF.svg)](https://www.nuget.org/packages/Idam.Libs.EF) [![.NET](https://github.com/ronnygunawan/RG.RazorMail/actions/workflows/CI.yml/badge.svg)](https://github.com/idamachmadfaizin/Idam.Libs.EF/actions/workflows/test.yml)
 
 [Idam.Libs.EF](https://github.com/idamachmadfaizin/Idam.Libs.EF) is .Net Core (C#) for Entity Framework (EF) Utils.
 
@@ -14,6 +14,8 @@ If you like or are using this project please give it a star. Thanks!
 - Timestamps (CreatedAt, UpdatedAt).
 
 >Both features support DateTime and [Unix Time Milliseconds](https://learn.microsoft.com/en-us/dotnet/api/system.datetimeoffset.tounixtimemilliseconds?view=net-7.0) format.
+>
+>DateTime using Utc format
 >
 >Example of Unix Time Milliseconds: [currentmillis](https://currentmillis.com)
 
