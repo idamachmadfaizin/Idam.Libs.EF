@@ -111,9 +111,12 @@ public static class DbContextExtension
         if (typeof(ISoftDelete).IsAssignableFrom(mutable.ClrType) || typeof(ISoftDeleteUnix).IsAssignableFrom(mutable.ClrType))
         {
             var parameter = Expression.Parameter(mutable.ClrType, "e");
+            Type[] typeArguments = new[] { typeof(ISoftDelete).IsAssignableFrom(mutable.ClrType) ? typeof(DateTime?) : typeof(long?) };
+
             var body = Expression.Equal(
-                Expression.Call(typeof(Microsoft.EntityFrameworkCore.EF), nameof(Microsoft.EntityFrameworkCore.EF.Property), new[] { typeof(long?) }, parameter, Expression.Constant(nameof(ISoftDelete.DeletedAt))),
+                Expression.Call(typeof(Microsoft.EntityFrameworkCore.EF), nameof(Microsoft.EntityFrameworkCore.EF.Property), typeArguments, parameter, Expression.Constant(nameof(ISoftDelete.DeletedAt))),
                 Expression.Constant(null));
+
             var expression = Expression.Lambda(body, parameter);
 
             builder.Entity(mutable.ClrType).HasQueryFilter(expression);
