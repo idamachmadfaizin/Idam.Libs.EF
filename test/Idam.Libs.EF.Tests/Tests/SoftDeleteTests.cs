@@ -12,7 +12,7 @@ public class SoftDeleteTests : BaseTest
 
         var dataFromDb = await _context.Boos.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id.Equals(data.Id));
 
-        Assert.NotNull(dataFromDb);
+        Assert.Null(dataFromDb);
         Assert.NotNull(dataFromDb.DeletedAt);
     }
 
