@@ -5,7 +5,7 @@ namespace Idam.Libs.EF.Tests.Tests;
 public class SoftDeleteTests : BaseTest
 {
     [Fact]
-    public async Task DateTimeDelete()
+    public async Task Should_SetDeletedAt_OnSoftDelete()
     {
         var data = await this.AddAsync(_booFaker.Generate());
         data = await this.DeleteAsync(data);
@@ -17,7 +17,7 @@ public class SoftDeleteTests : BaseTest
     }
 
     [Fact]
-    public async Task DateTimeSoftDeleteFilter()
+    public async Task When_SoftDeleted_ShouldClearDataFromNewList()
     {
         var data = await this.AddAsync(_booFaker.Generate());
         data = await this.DeleteAsync(data);
@@ -28,7 +28,7 @@ public class SoftDeleteTests : BaseTest
     }
 
     [Fact]
-    public async Task DateTimeRestore()
+    public async Task Should_RestoreSoftDeletedEntity()
     {
         var data = await this.AddAsync(_booFaker.Generate());
         data = await this.DeleteAsync(data);
@@ -51,7 +51,7 @@ public class SoftDeleteTests : BaseTest
     }
 
     [Fact]
-    public async Task DateTimePemanentDelete()
+    public async Task Should_PerformPermanentDelete_AfterSoftDelete()
     {
         var data = await this.AddAsync(_booFaker.Generate());
         data = await this.DeleteAsync(data);
@@ -62,7 +62,7 @@ public class SoftDeleteTests : BaseTest
     }
 
     [Fact]
-    public async Task UnixDelete()
+    public async Task Should_SetDeletedAt_OnUnixSoftDelete()
     {
         var data = await this.AddAsync(_fooFaker.Generate());
         data = await this.DeleteAsync(data);
@@ -74,7 +74,7 @@ public class SoftDeleteTests : BaseTest
     }
 
     [Fact]
-    public async Task UnixSoftDeleteFilter()
+    public async Task When_SoftDeleted_ShouldClearUnixDataFromNewList()
     {
         var data = await this.AddAsync(_fooFaker.Generate());
         data = await this.DeleteAsync(data);
@@ -85,7 +85,7 @@ public class SoftDeleteTests : BaseTest
     }
 
     [Fact]
-    public async Task UnixPemanentDelete()
+    public async Task Should_PerformPermanentDelete_AfterUnixSoftDelete()
     {
         var data = await this.AddAsync(this._fooFaker.Generate());
         data = await this.DeleteAsync(data);
@@ -97,7 +97,7 @@ public class SoftDeleteTests : BaseTest
     }
 
     [Fact]
-    public async Task UnixRestore()
+    public async Task Should_RestoreUnixSoftDeletedEntity()
     {
         var data = await this.AddAsync(_fooFaker.Generate());
         data = await this.DeleteAsync(data);

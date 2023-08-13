@@ -7,7 +7,7 @@ namespace Idam.Libs.EF.Tests.Tests;
 public class TimestampsTests : BaseTest
 {
     [Fact]
-    public void When_ConfigureTimeStamps_ShouldUpdatedValue()
+    public void Should_UpdateTimeStampsConfiguration_When_Configured()
     {
         var services = new ServiceCollection();
 
@@ -21,7 +21,7 @@ public class TimestampsTests : BaseTest
     }
 
     [Fact]
-    public async Task DateTimeCreate()
+    public async Task Should_SetCreatedAt_OnDateTimeCreate()
     {
         var data = _booFaker.Generate();
         await _context.Boos.AddAsync(data);
@@ -35,7 +35,7 @@ public class TimestampsTests : BaseTest
     }
 
     [Fact]
-    public async Task DateTimeUpdate()
+    public async Task Should_UpdateUpdatedAt_OnDateTimeUpdate()
     {
         var data = await this.AddAsync(_booFaker.Generate());
 
@@ -55,7 +55,7 @@ public class TimestampsTests : BaseTest
     }
 
     [Fact]
-    public async Task UnixCreate()
+    public async Task Should_SetCreatedAt_OnUnixCreate()
     {
         var data = await this.AddAsync(_fooFaker.Generate());
 
@@ -67,7 +67,7 @@ public class TimestampsTests : BaseTest
     }
 
     [Fact]
-    public async Task UnixUpdate()
+    public async Task Should_UpdateUpdatedAt_OnUnixUpdate()
     {
         var data = await this.AddAsync(_fooFaker.Generate());
 
