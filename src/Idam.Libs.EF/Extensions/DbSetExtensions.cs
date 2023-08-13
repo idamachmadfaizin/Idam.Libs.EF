@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 
 namespace Idam.Libs.EF.Extensions;
-public static class DbSetExtension
+public static class DbSetExtensions
 {
     /// <summary>
     /// DbSet extension to restore deleted data

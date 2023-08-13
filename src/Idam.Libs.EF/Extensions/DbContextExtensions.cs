@@ -1,7 +1,10 @@
 ﻿using Idam.Libs.EF.Interfaces;
+using Idam.Libs.EF.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System.Linq.Expressions;
 
 namespace Idam.Libs.EF.Extensions;
@@ -9,8 +12,27 @@ namespace Idam.Libs.EF.Extensions;
 /// <summary>
 /// DbContext extension
 /// </summary>
-public static class DbContextExtension
+public static class DbContextExtensions
 {
+    private static TimeStampsOptions _timeStampsOptions = new();
+
+    public static TimeStampsOptions TimeStampsOptions { get => _timeStampsOptions; }
+
+    /// <summary>
+    /// Inject IServiceProvider to this class
+    /// </summary>
+    /// <param name="provider"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static void Configure(IServiceProvider provider)
+    {
+        if (provider is null)
+        {
+            throw new ArgumentNullException(nameof(provider));
+        }
+
+        _timeStampsOptions = GetTimeStampsOptions(provider);
+    }
+
     /// <summary>
     /// Add Unix timestamps to the TimeStamps Entity when state is Added or Modified or Deleted
     /// </summary>
@@ -33,7 +55,7 @@ public static class DbContextExtension
 
         // current datetime
         var nowUnix = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        var now = DateTime.UtcNow;
+        var now = _timeStampsOptions.UseUtcDateTime ? DateTime.UtcNow : DateTime.Now;
 
         switch (entityEntry.State)
         {
@@ -77,6 +99,25 @@ public static class DbContextExtension
             default:
                 break;
         }
+    }
+
+    /// <summary>
+    /// Get TimeStampsOptions from DI
+    /// </summary>
+    /// <param name="_serviceProvider"></param>
+    /// <returns></returns>
+    private static TimeStampsOptions GetTimeStampsOptions(IServiceProvider? provider)
+    {
+        if (provider is not null)
+        {
+            var optionsTimeStampsOptions = provider.GetRequiredService<IOptions<TimeStampsOptions>>();
+            if (optionsTimeStampsOptions is not null)
+            {
+                return optionsTimeStampsOptions.Value;
+            }
+        }
+
+        return new TimeStampsOptions();
     }
 
     /// <summary>
