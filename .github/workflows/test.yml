@@ -2,7 +2,7 @@ name: Test NuGet Package
 on: [push]
 
 env:
-  dotnetVersion: 7.0.x
+  dotnetVersion: 6.x.x
   testProjectPath: test/Idam.Libs.EF.Tests
   srcProjectPath: src/Idam.Libs.EF
 
