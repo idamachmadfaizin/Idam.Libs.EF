@@ -3,7 +3,7 @@
 /// <summary>
 /// SoftDelete interface using unix format
 /// </summary>
-public interface ISoftDeleteUnix : ISoftDeleteBase
+public interface ISoftDeleteUnix
 {
     long? DeletedAt { get; set; }
 }

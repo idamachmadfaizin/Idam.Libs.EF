@@ -1,11 +1,9 @@
-﻿using Idam.Libs.EF.Interfaces;
-using Idam.Libs.EF.Models;
+﻿using Idam.Libs.EF.Attributes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Idam.Libs.EF.Extensions;
 
@@ -14,25 +12,6 @@ namespace Idam.Libs.EF.Extensions;
 /// </summary>
 public static class DbContextExtensions
 {
-    private static TimeStampsOptions _timeStampsOptions = new();
-
-    public static TimeStampsOptions TimeStampsOptions { get => _timeStampsOptions; }
-
-    /// <summary>
-    /// Inject IServiceProvider to this class
-    /// </summary>
-    /// <param name="provider"></param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public static void Configure(IServiceProvider provider)
-    {
-        if (provider is null)
-        {
-            throw new ArgumentNullException(nameof(provider));
-        }
-
-        _timeStampsOptions = GetTimeStampsOptions(provider);
-    }
-
     /// <summary>
     /// Add Unix timestamps to the TimeStamps Entity when state is Added or Modified or Deleted
     /// </summary>
@@ -41,7 +20,12 @@ public static class DbContextExtensions
     {
         foreach (var entityEntry in changeTracker.Entries())
         {
-            AddTimestamps(entityEntry);
+            var timeStampsAttribute = entityEntry.Entity.GetType().GetCustomAttribute<TimeStampsAttribute>();
+
+            if (timeStampsAttribute is not null)
+            {
+                AddTimestamps(entityEntry, timeStampsAttribute);
+            }
         }
     }
 
@@ -49,75 +33,78 @@ public static class DbContextExtensions
     /// Add Unix timestamps to the TimeStamps Entity when state is Added or Modified or Deleted
     /// </summary>
     /// <param name="entityEntry"></param>
-    private static void AddTimestamps(this EntityEntry? entityEntry)
+    private static void AddTimestamps(this EntityEntry? entityEntry, TimeStampsAttribute timeStampsAttribute)
     {
         if (entityEntry is null) return;
 
         // current datetime
-        var nowUnix = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        var now = _timeStampsOptions.UseUtcDateTime ? DateTime.UtcNow : DateTime.Now;
+        object now = timeStampsAttribute.TimeStampsType switch
+        {
+            TimeStampsType.Unix => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+            TimeStampsType.UtcDateTime => DateTime.UtcNow,
+            _ => DateTime.Now,
+        };
+
+        Type timeStampsType = timeStampsAttribute.TimeStampsType switch
+        {
+            TimeStampsType.Unix => typeof(long),
+            _ => typeof(DateTime),
+        };
+
+        var type = entityEntry.Entity.GetType();
+        var createdAtProperty = type.GetProperty(timeStampsAttribute.CreatedAtField);
+        var updatedAtProperty = type.GetProperty(timeStampsAttribute.UpdatedAtField);
+        var deletedAtProperty = type.GetProperty(timeStampsAttribute.DeletedAtField);
 
         switch (entityEntry.State)
         {
             case EntityState.Modified:
-                if (entityEntry.Entity is ITimeStamps timeStampsModified)
+                if (updatedAtProperty is null || updatedAtProperty.PropertyType != timeStampsType)
                 {
-                    timeStampsModified.UpdatedAt = now;
+                    throw new InvalidCastException($"The property '{timeStampsAttribute.UpdatedAtField}' in {type.Name} is not of type {timeStampsType.Name}.");
                 }
-                else if (entityEntry.Entity is ITimeStampsUnix timeStampsUnix)
-                {
-                    timeStampsUnix.UpdatedAt = nowUnix;
-                }
+
+                updatedAtProperty.SetValue(entityEntry.Entity, now, null);
                 break;
 
             case EntityState.Added:
-                if (entityEntry.Entity is ITimeStamps timeStampsAdded)
+                if (createdAtProperty is null || createdAtProperty.PropertyType != timeStampsType)
                 {
-                    timeStampsAdded.CreatedAt = now;
-                    timeStampsAdded.UpdatedAt = now;
+                    throw new InvalidCastException($"The property '{timeStampsAttribute.CreatedAtField}' in {type.Name} is not of type {timeStampsType.Name}.");
                 }
-                else if (entityEntry.Entity is ITimeStampsUnix timeStampsUnix)
+                if (updatedAtProperty is null || updatedAtProperty.PropertyType != timeStampsType)
                 {
-                    timeStampsUnix.CreatedAt = nowUnix;
-                    timeStampsUnix.UpdatedAt = nowUnix;
+                    throw new InvalidCastException($"The property '{timeStampsAttribute.UpdatedAtField}' in {type.Name} is not of type {timeStampsType.Name}.");
                 }
+
+                createdAtProperty.SetValue(entityEntry.Entity, now, null);
+                updatedAtProperty.SetValue(entityEntry.Entity, now, null);
                 break;
 
             case EntityState.Deleted:
-                if (entityEntry.Entity is ISoftDelete softDelete && softDelete.DeletedAt is null)
+                if (deletedAtProperty is null)
                 {
-                    entityEntry.State = EntityState.Modified;
-                    softDelete.DeletedAt = now;
+                    return;
                 }
-                else if (entityEntry.Entity is ISoftDeleteUnix softDeleteUnix && softDeleteUnix.DeletedAt is null)
+
+                timeStampsType = typeof(Nullable<>).MakeGenericType(timeStampsType);
+                if (deletedAtProperty is null || deletedAtProperty.PropertyType != timeStampsType)
+                {
+                    throw new InvalidCastException($"The property '{timeStampsAttribute.DeletedAtField}' in {type.Name} is not of type {timeStampsType.Name}.");
+                }
+
+                var value = deletedAtProperty.GetValue(entityEntry.Entity);
+
+                if (value is null)
                 {
                     entityEntry.State = EntityState.Modified;
-                    softDeleteUnix.DeletedAt = nowUnix;
+                    deletedAtProperty.SetValue(entityEntry.Entity, now, null);
                 }
                 break;
 
             default:
                 break;
         }
-    }
-
-    /// <summary>
-    /// Get TimeStampsOptions from DI
-    /// </summary>
-    /// <param name="_serviceProvider"></param>
-    /// <returns></returns>
-    private static TimeStampsOptions GetTimeStampsOptions(IServiceProvider? provider)
-    {
-        if (provider is not null)
-        {
-            var optionsTimeStampsOptions = provider.GetRequiredService<IOptions<TimeStampsOptions>>();
-            if (optionsTimeStampsOptions is not null)
-            {
-                return optionsTimeStampsOptions.Value;
-            }
-        }
-
-        return new TimeStampsOptions();
     }
 
     /// <summary>
@@ -149,18 +136,26 @@ public static class DbContextExtensions
             return;
         }
 
-        if (typeof(ISoftDelete).IsAssignableFrom(mutable.ClrType) || typeof(ISoftDeleteUnix).IsAssignableFrom(mutable.ClrType))
-        {
-            var parameter = Expression.Parameter(mutable.ClrType, "e");
-            Type[] typeArguments = new[] { typeof(ISoftDelete).IsAssignableFrom(mutable.ClrType) ? typeof(DateTime?) : typeof(long?) };
+        var timeStampsAttribute = mutable.ClrType.GetCustomAttribute<TimeStampsAttribute>();
 
-            var body = Expression.Equal(
-                Expression.Call(typeof(Microsoft.EntityFrameworkCore.EF), nameof(Microsoft.EntityFrameworkCore.EF.Property), typeArguments, parameter, Expression.Constant(nameof(ISoftDelete.DeletedAt))),
+        if (timeStampsAttribute is null)
+        {
+            return;
+        }
+
+        var parameter = Expression.Parameter(mutable.ClrType, "e");
+        Type[] typeArguments = timeStampsAttribute.TimeStampsType switch
+        {
+            TimeStampsType.Unix => new[] { typeof(long?) },
+            _ => new[] { typeof(DateTime?) },
+        };
+
+        var body = Expression.Equal(
+                Expression.Call(typeof(Microsoft.EntityFrameworkCore.EF), nameof(Microsoft.EntityFrameworkCore.EF.Property), typeArguments, parameter, Expression.Constant(timeStampsAttribute.DeletedAtField)),
                 Expression.Constant(null));
 
-            var expression = Expression.Lambda(body, parameter);
+        var expression = Expression.Lambda(body, parameter);
 
-            builder.Entity(mutable.ClrType).HasQueryFilter(expression);
-        }
+        builder.Entity(mutable.ClrType).HasQueryFilter(expression);
     }
 }

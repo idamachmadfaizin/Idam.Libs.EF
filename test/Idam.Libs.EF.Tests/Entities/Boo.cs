@@ -1,9 +1,11 @@
-﻿using Idam.Libs.EF.Interfaces;
+﻿using Idam.Libs.EF.Attributes;
+using Idam.Libs.EF.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
 namespace Idam.Libs.EF.Tests.Entities;
 
-public class Boo : IGuidEntity, ITimeStamps, ISoftDelete
+[TimeStamps]
+public class Boo : IGuidEntity
 {
     public Guid Id { get; set; }
 

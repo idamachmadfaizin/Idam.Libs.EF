@@ -1,4 +1,5 @@
 ﻿using Idam.Libs.EF.Interfaces;
+using Idam.Libs.EF.Sample.Attributes;
 using Idam.Libs.EF.Sample.Models.Dto;
 using System.ComponentModel.DataAnnotations;
 
@@ -7,7 +8,8 @@ namespace Idam.Libs.EF.Sample.Models.Entity;
 /// <summary>
 /// Foo entity
 /// </summary>
-public class Foo : IGuidEntity, ITimeStampsUnix, ISoftDeleteUnix
+[UnixTimeStamps]
+public class Foo : IGuidEntity
 {
     public Foo()
     {

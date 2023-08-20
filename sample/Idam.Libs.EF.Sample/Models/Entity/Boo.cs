@@ -1,10 +1,11 @@
-﻿using Idam.Libs.EF.Interfaces;
+﻿using Idam.Libs.EF.Attributes;
+using Idam.Libs.EF.Interfaces;
 using Idam.Libs.EF.Sample.Models.Dto;
 using System.ComponentModel.DataAnnotations;
 
 namespace Idam.Libs.EF.Sample.Models.Entity;
-
-public class Boo : IGuidEntity, ITimeStamps, ISoftDelete
+[TimeStamps]
+public class Boo : IGuidEntity
 {
     public Boo()
     {

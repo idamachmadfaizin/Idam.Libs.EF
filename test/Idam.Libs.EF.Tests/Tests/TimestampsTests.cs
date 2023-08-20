@@ -1,25 +1,9 @@
-﻿using Idam.Libs.EF.Extensions;
-using Idam.Libs.EF.Tests.Ekstensions;
+﻿using Idam.Libs.EF.Tests.Ekstensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Idam.Libs.EF.Tests.Tests;
 public class TimestampsTests : BaseTest
 {
-    [Fact]
-    public void Should_UpdateTimeStampsConfiguration_When_Configured()
-    {
-        var services = new ServiceCollection();
-
-        var newUseUtcDateTime = true;
-        services.ConfigureTimeStamps(options =>
-        {
-            options.UseUtcDateTime = newUseUtcDateTime;
-        });
-
-        Assert.True(DbContextExtensions.TimeStampsOptions.UseUtcDateTime == newUseUtcDateTime);
-    }
-
     [Fact]
     public async Task Should_SetCreatedAt_OnDateTimeCreate()
     {
@@ -70,6 +54,8 @@ public class TimestampsTests : BaseTest
     public async Task Should_UpdateUpdatedAt_OnUnixUpdate()
     {
         var data = await this.AddAsync(_fooFaker.Generate());
+
+        await Task.Delay(5);
 
         var oldUpdatedAt = data.UpdatedAt;
 

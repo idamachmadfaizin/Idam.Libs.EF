@@ -1,4 +1,5 @@
-﻿using Idam.Libs.EF.Interfaces;
+﻿using Idam.Libs.EF.Attributes;
+using Idam.Libs.EF.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
 namespace Idam.Libs.EF.Tests.Entities;
@@ -6,7 +7,8 @@ namespace Idam.Libs.EF.Tests.Entities;
 /// <summary>
 /// Foo entity
 /// </summary>
-public class Foo : IGuidEntity, ITimeStampsUnix, ISoftDeleteUnix
+[TimeStamps(TimeStampsType = TimeStampsType.Unix)]
+public class Foo : IGuidEntity
 {
     public Guid Id { get; set; }
 
