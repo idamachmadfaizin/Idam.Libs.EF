@@ -1,5 +1,20 @@
 ﻿namespace Idam.Libs.EF.Attributes;
 
+/// <summary>
+/// TimeStamps type
+/// </summary>
+public enum TimeStampsType
+{
+    DateTime,
+    Unix,
+    UtcDateTime,
+}
+
+/// <summary>
+/// TimeStamps Attribute.
+/// 
+/// You can inherit this class to avoid declaring fields every time you use this attribute.
+/// </summary>
 [AttributeUsage(AttributeTargets.Class)]
 public class TimeStampsAttribute : Attribute
 {
@@ -10,19 +25,9 @@ public class TimeStampsAttribute : Attribute
 }
 
 /// <summary>
-/// TimeStamps type
-/// </summary>
-public enum TimeStampsType
-{
-    Unix,
-    UtcDateTime,
-    DateTime
-}
-
-/// <summary>
 /// TimeStamps Type Extensions
 /// </summary>
-static class TimeStampsTypeExtensions
+internal static class TimeStampsTypeExtensions
 {
     /// <summary>
     /// Corresponding data type for the given TimeStampsType enum value.

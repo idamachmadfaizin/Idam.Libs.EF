@@ -7,3 +7,11 @@ public interface ISoftDelete
 {
     DateTime? DeletedAt { get; set; }
 }
+
+/// <summary>
+/// SoftDelete interface using unix format
+/// </summary>
+public interface ISoftDeleteUnix
+{
+    long? DeletedAt { get; set; }
+}

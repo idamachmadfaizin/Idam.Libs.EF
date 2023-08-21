@@ -13,14 +13,14 @@ namespace Idam.Libs.EF.Extensions;
 public static class DbContextExtensions
 {
     /// <summary>
-    /// Add Unix timestamps to the TimeStamps Entity when state is Added or Modified or Deleted
+    /// Add timestamps to the Entity with TimeStampsAttribute when state is Added or Modified or Deleted.
     /// </summary>
     /// <param name="changeTracker"></param>
     public static void AddTimestamps(this ChangeTracker changeTracker)
     {
-        foreach (var entityEntry in changeTracker.Entries())
+        foreach (EntityEntry entityEntry in changeTracker.Entries())
         {
-            var timeStampsAttribute = entityEntry.Entity.GetType().GetCustomAttribute<TimeStampsAttribute>();
+            TimeStampsAttribute? timeStampsAttribute = entityEntry.Entity.GetType().GetCustomAttribute<TimeStampsAttribute>();
 
             if (timeStampsAttribute is not null)
             {
@@ -30,7 +30,7 @@ public static class DbContextExtensions
     }
 
     /// <summary>
-    /// Add Unix timestamps to the TimeStamps Entity when state is Added or Modified or Deleted
+    /// Add timestamps to the Entity with TimeStampsAttribute when state is Added or Modified or Deleted.
     /// </summary>
     /// <param name="entityEntry"></param>
     private static void AddTimestamps(this EntityEntry? entityEntry, TimeStampsAttribute timeStampsAttribute)
@@ -38,12 +38,12 @@ public static class DbContextExtensions
         if (entityEntry is null) return;
 
         // current datetime
-        object now = timeStampsAttribute.TimeStampsType.GetMapValue();
+        var now = timeStampsAttribute.TimeStampsType.GetMapValue();
 
-        var entityType = entityEntry.Entity.GetType();
-        var createdAtProperty = entityType.GetProperty(timeStampsAttribute.CreatedAtField);
-        var updatedAtProperty = entityType.GetProperty(timeStampsAttribute.UpdatedAtField);
-        var deletedAtProperty = entityType.GetProperty(timeStampsAttribute.DeletedAtField);
+        Type entityType = entityEntry.Entity.GetType();
+        PropertyInfo? createdAtProperty = entityType.GetProperty(timeStampsAttribute.CreatedAtField);
+        PropertyInfo? updatedAtProperty = entityType.GetProperty(timeStampsAttribute.UpdatedAtField);
+        PropertyInfo? deletedAtProperty = entityType.GetProperty(timeStampsAttribute.DeletedAtField);
 
         switch (entityEntry.State)
         {
@@ -79,16 +79,16 @@ public static class DbContextExtensions
     }
 
     /// <summary>
-    /// Query Filter to get model where DeletedAt not null
+    /// Query Filter to get model where DeletedAt field is null
     /// </summary>
     /// <param name="builder"></param>
     public static void AddSoftDeleteFilter(this ModelBuilder builder)
     {
-        var mutables = builder.Model.GetEntityTypes();
+        IEnumerable<IMutableEntityType>? mutables = builder.Model.GetEntityTypes();
 
         if (mutables is not null)
         {
-            foreach (var mutable in mutables)
+            foreach (IMutableEntityType mutable in mutables)
             {
                 builder.AddSoftDeleteFilter(mutable);
             }
@@ -96,36 +96,30 @@ public static class DbContextExtensions
     }
 
     /// <summary>
-    /// Query Filter to get model where DeletedAt not null
+    /// Query Filter to get model where DeletedAt field is null
     /// </summary>
     /// <param name="builder"></param>
     /// <param name="mutable"></param>
     private static void AddSoftDeleteFilter(this ModelBuilder builder, IMutableEntityType? mutable)
     {
-        if (mutable is null)
-        {
-            return;
-        }
+        if (mutable is null) return;
 
-        var timeStampsAttribute = mutable.ClrType.GetCustomAttribute<TimeStampsAttribute>();
+        TimeStampsAttribute? timeStampsAttribute = mutable.ClrType.GetCustomAttribute<TimeStampsAttribute>();
 
-        if (timeStampsAttribute is null)
-        {
-            return;
-        }
+        if (timeStampsAttribute is null) return;
 
-        var parameter = Expression.Parameter(mutable.ClrType, "e");
+        ParameterExpression parameter = Expression.Parameter(mutable.ClrType, "e");
         Type[] typeArguments = timeStampsAttribute.TimeStampsType switch
         {
             TimeStampsType.Unix => new[] { typeof(long?) },
             _ => new[] { typeof(DateTime?) },
         };
 
-        var body = Expression.Equal(
+        BinaryExpression body = Expression.Equal(
                 Expression.Call(typeof(Microsoft.EntityFrameworkCore.EF), nameof(Microsoft.EntityFrameworkCore.EF.Property), typeArguments, parameter, Expression.Constant(timeStampsAttribute.DeletedAtField)),
                 Expression.Constant(null));
 
-        var expression = Expression.Lambda(body, parameter);
+        LambdaExpression expression = Expression.Lambda(body, parameter);
 
         builder.Entity(mutable.ClrType).HasQueryFilter(expression);
     }
@@ -146,7 +140,7 @@ public static class DbContextExtensions
             timeStampsType = typeof(Nullable<>).MakeGenericType(timeStampsType);
         }
 
-        var property = entityType.GetProperty(propertyName);
+        PropertyInfo? property = entityType.GetProperty(propertyName);
 
         if (property is null || property.PropertyType != timeStampsType)
         {

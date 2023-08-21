@@ -19,8 +19,8 @@ public static class DbSetExtensions
     {
         ArgumentNullException.ThrowIfNull(dbSet, nameof(dbSet));
 
-        var type = entity.GetType();
-        var timeStampsAttribute = type.GetCustomAttribute<TimeStampsAttribute>();
+        Type type = entity.GetType();
+        TimeStampsAttribute? timeStampsAttribute = type.GetCustomAttribute<TimeStampsAttribute>();
 
         ArgumentNullException.ThrowIfNull(timeStampsAttribute, nameof(timeStampsAttribute));
 
@@ -29,7 +29,7 @@ public static class DbSetExtensions
             TimeStampsType.Unix => typeof(long?),
             _ => typeof(DateTime?),
         };
-        var deletedAtProperty = type.GetProperty(timeStampsAttribute.DeletedAtField);
+        PropertyInfo? deletedAtProperty = type.GetProperty(timeStampsAttribute.DeletedAtField);
 
         if (deletedAtProperty is null || deletedAtProperty.PropertyType != timeStampsType)
         {
