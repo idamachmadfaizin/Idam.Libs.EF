@@ -5,20 +5,19 @@ namespace Idam.Libs.EF.Extensions;
 internal static class InvalidCastValidationException
 {
     /// <summary>
-    /// Throw when entity property not valid.
+    /// Throws if invalid time stamps.
     /// </summary>
-    /// <param name="propertyName"></param>
-    /// <param name="entityType"></param>
-    /// <param name="timeStampsAttribute"></param>
-    /// <exception cref="InvalidCastValidationException"></exception>
+    /// <param name="propertyName">Name of the property.</param>
+    /// <param name="entityType">Type of the entity.</param>
+    /// <param name="timeStampsAttribute">The time stamps attribute.</param>
+    /// <exception cref="InvalidCastException">The property '{propertyName}' in {entityType.Name} is not of type {timeStampsType.Name}.</exception>
     public static void ThrowIfInvalidTimeStamps(string propertyName, Type entityType, TimeStampsAttribute timeStampsAttribute)
     {
-        Type timeStampsType = timeStampsAttribute.TimeStampsType.GetMapType();
+        var isDeletedAtField = propertyName.Equals(timeStampsAttribute.DeletedAtField);
 
-        if (propertyName.Equals(timeStampsAttribute.DeletedAtField))
-        {
-            timeStampsType = typeof(Nullable<>).MakeGenericType(timeStampsType);
-        }
+        Type timeStampsType = isDeletedAtField
+            ? timeStampsAttribute.TimeStampsType.GetNullableMapType()
+            : timeStampsAttribute.TimeStampsType.GetMapType();
 
         PropertyInfo? property = entityType.GetProperty(propertyName);
 

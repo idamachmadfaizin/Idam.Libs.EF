@@ -8,14 +8,15 @@ using System.Reflection;
 namespace Idam.Libs.EF.Extensions;
 
 /// <summary>
-/// DbContext extension
+/// DbContext extension class.
 /// </summary>
 public static class DbContextExtensions
 {
     /// <summary>
     /// Add timestamps to the Entity with TimeStampsAttribute when state is Added or Modified or Deleted.
     /// </summary>
-    /// <param name="changeTracker"></param>
+    /// <param name="changeTracker">The change tracker.</param>
+    /// <exception cref="InvalidCastException"></exception>
     public static void AddTimestamps(this ChangeTracker changeTracker)
     {
         foreach (EntityEntry entityEntry in changeTracker.Entries())
@@ -32,7 +33,9 @@ public static class DbContextExtensions
     /// <summary>
     /// Add timestamps to the Entity with TimeStampsAttribute when state is Added or Modified or Deleted.
     /// </summary>
-    /// <param name="entityEntry"></param>
+    /// <param name="entityEntry">The entity entry.</param>
+    /// <param name="timeStampsAttribute">The time stamps attribute.</param>
+    /// <exception cref="InvalidCastException"></exception>
     private static void AddTimestamps(this EntityEntry? entityEntry, TimeStampsAttribute timeStampsAttribute)
     {
         if (entityEntry is null) return;
@@ -79,9 +82,9 @@ public static class DbContextExtensions
     }
 
     /// <summary>
-    /// Query Filter to get model where DeletedAt field is null
+    /// Query Filter to get model where DeletedAt field is null.
     /// </summary>
-    /// <param name="builder"></param>
+    /// <param name="builder">The builder.</param>
     public static void AddSoftDeleteFilter(this ModelBuilder builder)
     {
         IEnumerable<IMutableEntityType>? mutables = builder.Model.GetEntityTypes();
@@ -96,10 +99,10 @@ public static class DbContextExtensions
     }
 
     /// <summary>
-    /// Query Filter to get model where DeletedAt field is null
+    /// Query Filter to get model where DeletedAt field is null.
     /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="mutable"></param>
+    /// <param name="builder">The builder.</param>
+    /// <param name="mutable">The mutable.</param>
     private static void AddSoftDeleteFilter(this ModelBuilder builder, IMutableEntityType? mutable)
     {
         if (mutable is null) return;
@@ -109,11 +112,8 @@ public static class DbContextExtensions
         if (timeStampsAttribute is null) return;
 
         ParameterExpression parameter = Expression.Parameter(mutable.ClrType, "e");
-        Type[] typeArguments = timeStampsAttribute.TimeStampsType switch
-        {
-            TimeStampsType.Unix => new[] { typeof(long?) },
-            _ => new[] { typeof(DateTime?) },
-        };
+
+        Type[] typeArguments = new[] { timeStampsAttribute.TimeStampsType.GetNullableMapType() };
 
         BinaryExpression body = Expression.Equal(
                 Expression.Call(typeof(Microsoft.EntityFrameworkCore.EF), nameof(Microsoft.EntityFrameworkCore.EF.Property), typeArguments, parameter, Expression.Constant(timeStampsAttribute.DeletedAtField)),

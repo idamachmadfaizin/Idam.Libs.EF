@@ -1,7 +1,7 @@
 ﻿namespace Idam.Libs.EF.Interfaces;
 
 /// <summary>
-/// Timestamps interface using unix format
+/// Timestamps interface using Unix format
 /// </summary>
 public interface ITimeStamps
 {
@@ -10,7 +10,7 @@ public interface ITimeStamps
 }
 
 /// <summary>
-/// Timestamps interface using unix format
+/// Timestamps interface using Unix format
 /// </summary>
 public interface ITimeStampsUnix
 {

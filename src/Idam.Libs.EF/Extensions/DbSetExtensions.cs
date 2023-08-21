@@ -1,19 +1,21 @@
 ﻿using Idam.Libs.EF.Attributes;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Reflection;
 
 namespace Idam.Libs.EF.Extensions;
 public static class DbSetExtensions
 {
     /// <summary>
-    /// Restore deleted data.
+    /// Restores the specified entity.
     /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    /// <param name="dbSet"></param>
-    /// <param name="entity"></param>
+    /// <typeparam name="TEntity">The type of the entity.</typeparam>
+    /// <param name="dbSet">The database set.</param>
+    /// <param name="entity">The entity.</param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="InvalidCastException"></exception>
     public static TEntity Restore<TEntity>(this DbSet<TEntity> dbSet, TEntity entity)
         where TEntity : class
     {
@@ -28,23 +30,23 @@ public static class DbSetExtensions
 
         PropertyInfo? deletedAtProperty = entityType.GetProperty(timeStampsAttribute.DeletedAtField);
 
-        InvalidCastValidationException.ThrowIfInvalid(timeStampsAttribute.DeletedAtField, entityType, timeStampsAttribute);
-
         deletedAtProperty!.SetValue(entity, null, null);
 
         return entity;
     }
 
     /// <summary>
-    /// Force remove data.
+    /// Forces the remove.
     /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    /// <param name="dbSet"></param>
-    /// <param name="entity"></param>
+    /// <typeparam name="TEntity">The type of the entity.</typeparam>
+    /// <param name="dbSet">The database set.</param>
+    /// <param name="entity">The entity.</param>
     /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="InvalidCastException"></exception>
     public static EntityEntry<TEntity> ForceRemove<TEntity>(this DbSet<TEntity> dbSet, TEntity entity)
         where TEntity : class
-        {
+    {
         ArgumentNullException.ThrowIfNull(dbSet, nameof(dbSet));
 
         Type entityType = entity.GetType();
