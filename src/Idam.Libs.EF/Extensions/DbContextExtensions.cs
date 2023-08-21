@@ -48,21 +48,21 @@ public static class DbContextExtensions
         switch (entityEntry.State)
         {
             case EntityState.Modified:
-                InvalidCastValidationException.ThrowIfInvalid(timeStampsAttribute.UpdatedAtField, entityType, timeStampsAttribute);
+                InvalidCastValidationException.ThrowIfInvalidTimeStamps(timeStampsAttribute.UpdatedAtField, entityType, timeStampsAttribute);
 
                 updatedAtProperty!.SetValue(entityEntry.Entity, now, null);
                 break;
 
             case EntityState.Added:
-                InvalidCastValidationException.ThrowIfInvalid(timeStampsAttribute.CreatedAtField, entityType, timeStampsAttribute);
-                InvalidCastValidationException.ThrowIfInvalid(timeStampsAttribute.UpdatedAtField, entityType, timeStampsAttribute);
+                InvalidCastValidationException.ThrowIfInvalidTimeStamps(timeStampsAttribute.CreatedAtField, entityType, timeStampsAttribute);
+                InvalidCastValidationException.ThrowIfInvalidTimeStamps(timeStampsAttribute.UpdatedAtField, entityType, timeStampsAttribute);
 
                 createdAtProperty!.SetValue(entityEntry.Entity, now, null);
                 updatedAtProperty!.SetValue(entityEntry.Entity, now, null);
                 break;
 
             case EntityState.Deleted:
-                InvalidCastValidationException.ThrowIfInvalid(timeStampsAttribute.DeletedAtField, entityType, timeStampsAttribute);
+                InvalidCastValidationException.ThrowIfInvalidTimeStamps(timeStampsAttribute.DeletedAtField, entityType, timeStampsAttribute);
 
                 var value = deletedAtProperty!.GetValue(entityEntry.Entity);
 

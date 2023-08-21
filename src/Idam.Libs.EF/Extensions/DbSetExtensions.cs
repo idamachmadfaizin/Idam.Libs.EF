@@ -24,6 +24,8 @@ public static class DbSetExtensions
 
         ArgumentNullException.ThrowIfNull(timeStampsAttribute, nameof(timeStampsAttribute));
 
+        InvalidCastValidationException.ThrowIfInvalidTimeStamps(timeStampsAttribute.DeletedAtField, entityType, timeStampsAttribute);
+
         PropertyInfo? deletedAtProperty = entityType.GetProperty(timeStampsAttribute.DeletedAtField);
 
         InvalidCastValidationException.ThrowIfInvalid(timeStampsAttribute.DeletedAtField, entityType, timeStampsAttribute);
@@ -32,19 +34,32 @@ public static class DbSetExtensions
 
         return entity;
     }
+
+    /// <summary>
+    /// Force remove data.
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <param name="dbSet"></param>
+    /// <param name="entity"></param>
+    /// <returns></returns>
+    public static EntityEntry<TEntity> ForceRemove<TEntity>(this DbSet<TEntity> dbSet, TEntity entity)
+        where TEntity : class
         {
-            TimeStampsType.Unix => typeof(long?),
-            _ => typeof(DateTime?),
-        };
-        PropertyInfo? deletedAtProperty = type.GetProperty(timeStampsAttribute.DeletedAtField);
+        ArgumentNullException.ThrowIfNull(dbSet, nameof(dbSet));
 
-        if (deletedAtProperty is null || deletedAtProperty.PropertyType != timeStampsType)
-        {
-            throw new InvalidCastException($"The property '{timeStampsAttribute.DeletedAtField}' in {type.Name} is not of type {timeStampsType.Name}.");
-        }
+        Type entityType = entity.GetType();
+        TimeStampsAttribute? timeStampsAttribute = entityType.GetCustomAttribute<TimeStampsAttribute>();
 
-        deletedAtProperty.SetValue(entity, null, null);
+        ArgumentNullException.ThrowIfNull(timeStampsAttribute, nameof(timeStampsAttribute));
 
-        return entity;
+        PropertyInfo? deletedAtProperty = entityType.GetProperty(timeStampsAttribute.DeletedAtField);
+
+        InvalidCastValidationException.ThrowIfInvalidTimeStamps(timeStampsAttribute.DeletedAtField, entityType, timeStampsAttribute);
+
+        var now = timeStampsAttribute.TimeStampsType.GetMapValue();
+
+        deletedAtProperty!.SetValue(entity, now, null);
+
+        return dbSet.Remove(entity);
     }
 }

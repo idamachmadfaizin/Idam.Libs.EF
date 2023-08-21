@@ -11,7 +11,7 @@ internal static class InvalidCastValidationException
     /// <param name="entityType"></param>
     /// <param name="timeStampsAttribute"></param>
     /// <exception cref="InvalidCastValidationException"></exception>
-    public static void ThrowIfInvalid(string propertyName, Type entityType, TimeStampsAttribute timeStampsAttribute)
+    public static void ThrowIfInvalidTimeStamps(string propertyName, Type entityType, TimeStampsAttribute timeStampsAttribute)
     {
         Type timeStampsType = timeStampsAttribute.TimeStampsType.GetMapType();
 
