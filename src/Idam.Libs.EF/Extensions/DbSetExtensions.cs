@@ -6,7 +6,7 @@ namespace Idam.Libs.EF.Extensions;
 public static class DbSetExtensions
 {
     /// <summary>
-    /// DbSet extension to restore deleted data
+    /// Restore deleted data.
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     /// <param name="dbSet"></param>
@@ -19,12 +19,19 @@ public static class DbSetExtensions
     {
         ArgumentNullException.ThrowIfNull(dbSet, nameof(dbSet));
 
-        Type type = entity.GetType();
-        TimeStampsAttribute? timeStampsAttribute = type.GetCustomAttribute<TimeStampsAttribute>();
+        Type entityType = entity.GetType();
+        TimeStampsAttribute? timeStampsAttribute = entityType.GetCustomAttribute<TimeStampsAttribute>();
 
         ArgumentNullException.ThrowIfNull(timeStampsAttribute, nameof(timeStampsAttribute));
 
-        Type timeStampsType = timeStampsAttribute.TimeStampsType switch
+        PropertyInfo? deletedAtProperty = entityType.GetProperty(timeStampsAttribute.DeletedAtField);
+
+        InvalidCastValidationException.ThrowIfInvalid(timeStampsAttribute.DeletedAtField, entityType, timeStampsAttribute);
+
+        deletedAtProperty!.SetValue(entity, null, null);
+
+        return entity;
+    }
         {
             TimeStampsType.Unix => typeof(long?),
             _ => typeof(DateTime?),

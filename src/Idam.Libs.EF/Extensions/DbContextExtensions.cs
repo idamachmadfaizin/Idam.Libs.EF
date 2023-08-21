@@ -48,21 +48,21 @@ public static class DbContextExtensions
         switch (entityEntry.State)
         {
             case EntityState.Modified:
-                ThrowIfInvalid(timeStampsAttribute.UpdatedAtField, entityType, timeStampsAttribute);
+                InvalidCastValidationException.ThrowIfInvalid(timeStampsAttribute.UpdatedAtField, entityType, timeStampsAttribute);
 
                 updatedAtProperty!.SetValue(entityEntry.Entity, now, null);
                 break;
 
             case EntityState.Added:
-                ThrowIfInvalid(timeStampsAttribute.CreatedAtField, entityType, timeStampsAttribute);
-                ThrowIfInvalid(timeStampsAttribute.UpdatedAtField, entityType, timeStampsAttribute);
+                InvalidCastValidationException.ThrowIfInvalid(timeStampsAttribute.CreatedAtField, entityType, timeStampsAttribute);
+                InvalidCastValidationException.ThrowIfInvalid(timeStampsAttribute.UpdatedAtField, entityType, timeStampsAttribute);
 
                 createdAtProperty!.SetValue(entityEntry.Entity, now, null);
                 updatedAtProperty!.SetValue(entityEntry.Entity, now, null);
                 break;
 
             case EntityState.Deleted:
-                ThrowIfInvalid(timeStampsAttribute.DeletedAtField, entityType, timeStampsAttribute);
+                InvalidCastValidationException.ThrowIfInvalid(timeStampsAttribute.DeletedAtField, entityType, timeStampsAttribute);
 
                 var value = deletedAtProperty!.GetValue(entityEntry.Entity);
 
@@ -122,29 +122,5 @@ public static class DbContextExtensions
         LambdaExpression expression = Expression.Lambda(body, parameter);
 
         builder.Entity(mutable.ClrType).HasQueryFilter(expression);
-    }
-
-    /// <summary>
-    /// Throw when entity property not valid
-    /// </summary>
-    /// <param name="propertyName"></param>
-    /// <param name="entityType"></param>
-    /// <param name="timeStampsAttribute"></param>
-    /// <exception cref="InvalidCastException"></exception>
-    private static void ThrowIfInvalid(string propertyName, Type entityType, TimeStampsAttribute timeStampsAttribute)
-    {
-        Type timeStampsType = timeStampsAttribute.TimeStampsType.GetMapType();
-
-        if (propertyName.Equals(timeStampsAttribute.DeletedAtField))
-        {
-            timeStampsType = typeof(Nullable<>).MakeGenericType(timeStampsType);
-        }
-
-        PropertyInfo? property = entityType.GetProperty(propertyName);
-
-        if (property is null || property.PropertyType != timeStampsType)
-        {
-            throw new InvalidCastException($"The property '{propertyName}' in {entityType.Name} is not of type {timeStampsType.Name}.");
-        }
     }
 }
