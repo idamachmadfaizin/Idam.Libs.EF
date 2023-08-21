@@ -38,62 +38,33 @@ public static class DbContextExtensions
         if (entityEntry is null) return;
 
         // current datetime
-        object now = timeStampsAttribute.TimeStampsType switch
-        {
-            TimeStampsType.Unix => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-            TimeStampsType.UtcDateTime => DateTime.UtcNow,
-            _ => DateTime.Now,
-        };
+        object now = timeStampsAttribute.TimeStampsType.GetMapValue();
 
-        Type timeStampsType = timeStampsAttribute.TimeStampsType switch
-        {
-            TimeStampsType.Unix => typeof(long),
-            _ => typeof(DateTime),
-        };
-
-        var type = entityEntry.Entity.GetType();
-        var createdAtProperty = type.GetProperty(timeStampsAttribute.CreatedAtField);
-        var updatedAtProperty = type.GetProperty(timeStampsAttribute.UpdatedAtField);
-        var deletedAtProperty = type.GetProperty(timeStampsAttribute.DeletedAtField);
+        var entityType = entityEntry.Entity.GetType();
+        var createdAtProperty = entityType.GetProperty(timeStampsAttribute.CreatedAtField);
+        var updatedAtProperty = entityType.GetProperty(timeStampsAttribute.UpdatedAtField);
+        var deletedAtProperty = entityType.GetProperty(timeStampsAttribute.DeletedAtField);
 
         switch (entityEntry.State)
         {
             case EntityState.Modified:
-                if (updatedAtProperty is null || updatedAtProperty.PropertyType != timeStampsType)
-                {
-                    throw new InvalidCastException($"The property '{timeStampsAttribute.UpdatedAtField}' in {type.Name} is not of type {timeStampsType.Name}.");
-                }
+                ThrowIfInvalid(timeStampsAttribute.UpdatedAtField, entityType, timeStampsAttribute);
 
-                updatedAtProperty.SetValue(entityEntry.Entity, now, null);
+                updatedAtProperty!.SetValue(entityEntry.Entity, now, null);
                 break;
 
             case EntityState.Added:
-                if (createdAtProperty is null || createdAtProperty.PropertyType != timeStampsType)
-                {
-                    throw new InvalidCastException($"The property '{timeStampsAttribute.CreatedAtField}' in {type.Name} is not of type {timeStampsType.Name}.");
-                }
-                if (updatedAtProperty is null || updatedAtProperty.PropertyType != timeStampsType)
-                {
-                    throw new InvalidCastException($"The property '{timeStampsAttribute.UpdatedAtField}' in {type.Name} is not of type {timeStampsType.Name}.");
-                }
+                ThrowIfInvalid(timeStampsAttribute.CreatedAtField, entityType, timeStampsAttribute);
+                ThrowIfInvalid(timeStampsAttribute.UpdatedAtField, entityType, timeStampsAttribute);
 
-                createdAtProperty.SetValue(entityEntry.Entity, now, null);
-                updatedAtProperty.SetValue(entityEntry.Entity, now, null);
+                createdAtProperty!.SetValue(entityEntry.Entity, now, null);
+                updatedAtProperty!.SetValue(entityEntry.Entity, now, null);
                 break;
 
             case EntityState.Deleted:
-                if (deletedAtProperty is null)
-                {
-                    return;
-                }
+                ThrowIfInvalid(timeStampsAttribute.DeletedAtField, entityType, timeStampsAttribute);
 
-                timeStampsType = typeof(Nullable<>).MakeGenericType(timeStampsType);
-                if (deletedAtProperty is null || deletedAtProperty.PropertyType != timeStampsType)
-                {
-                    throw new InvalidCastException($"The property '{timeStampsAttribute.DeletedAtField}' in {type.Name} is not of type {timeStampsType.Name}.");
-                }
-
-                var value = deletedAtProperty.GetValue(entityEntry.Entity);
+                var value = deletedAtProperty!.GetValue(entityEntry.Entity);
 
                 if (value is null)
                 {
@@ -157,5 +128,29 @@ public static class DbContextExtensions
         var expression = Expression.Lambda(body, parameter);
 
         builder.Entity(mutable.ClrType).HasQueryFilter(expression);
+    }
+
+    /// <summary>
+    /// Throw when entity property not valid
+    /// </summary>
+    /// <param name="propertyName"></param>
+    /// <param name="entityType"></param>
+    /// <param name="timeStampsAttribute"></param>
+    /// <exception cref="InvalidCastException"></exception>
+    private static void ThrowIfInvalid(string propertyName, Type entityType, TimeStampsAttribute timeStampsAttribute)
+    {
+        Type timeStampsType = timeStampsAttribute.TimeStampsType.GetMapType();
+
+        if (propertyName.Equals(timeStampsAttribute.DeletedAtField))
+        {
+            timeStampsType = typeof(Nullable<>).MakeGenericType(timeStampsType);
+        }
+
+        var property = entityType.GetProperty(propertyName);
+
+        if (property is null || property.PropertyType != timeStampsType)
+        {
+            throw new InvalidCastException($"The property '{propertyName}' in {entityType.Name} is not of type {timeStampsType.Name}.");
+        }
     }
 }
