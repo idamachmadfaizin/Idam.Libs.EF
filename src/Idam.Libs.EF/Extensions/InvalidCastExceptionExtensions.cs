@@ -21,9 +21,13 @@ internal static class InvalidCastValidationException
 
         PropertyInfo? property = entityType.GetProperty(propertyName);
 
-        if (property is null || property.PropertyType != timeStampsType)
+        if (property is null)
         {
-            throw new InvalidCastException($"The property '{propertyName}' in {entityType.Name} is not of type {timeStampsType.Name}.");
+            throw new InvalidCastException($"The property '{propertyName}' doesn't exist in {entityType.Name}.");
+        }
+        else if (property.PropertyType != timeStampsType)
+        {
+            throw new InvalidCastException($"The property '{propertyName}' in {entityType.Name} is not of type {timeStampsType.FullName}.");
         }
     }
 }
