@@ -9,7 +9,7 @@ namespace Idam.Libs.EF.Sample.Models.Entity;
 /// Foo entity
 /// </summary>
 [UnixTimeStamps]
-public class Foo : IGuidEntity
+public class Foo : IGuidEntity, ITimeStampsUnix, ISoftDeleteUnix
 {
     public Foo()
     {

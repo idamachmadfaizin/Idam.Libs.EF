@@ -119,6 +119,29 @@ namespace Idam.Libs.EF.Sample.Controllers
             return NoContent();
         }
 
+        // DELETE: api/Boos/289c9eaa-3f35-4462-064a-08db6654a8e7/force
+        [HttpDelete("{id}/force")]
+        public async Task<IActionResult> ForceDeleteBoo(Guid id)
+        {
+            if (_context.Boos is null)
+            {
+                return NotFound();
+            }
+
+            var boo = await _context.Boos.IgnoreQueryFilters()
+                .FirstOrDefaultAsync(b => b.Id.Equals(id));
+
+            if (boo is null)
+            {
+                return NotFound();
+            }
+
+            _context.Boos.ForceRemove(boo);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
         // GET: api/Boos/deleted
         [HttpGet("deleted")]
         public async Task<ActionResult<IEnumerable<Boo>>> GetDeletedBoos()

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Idam.Libs.EF.Sample.Models.Entity;
 [TimeStamps]
-public class Boo : IGuidEntity
+public class Boo : IGuidEntity, ITimeStamps, ISoftDelete
 {
     public Boo()
     {
