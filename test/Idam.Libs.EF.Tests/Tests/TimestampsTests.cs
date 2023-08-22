@@ -7,32 +7,32 @@ public class TimestampsTests : BaseTest
     [Fact]
     public async Task Should_SetCreatedAt_OnDateTimeCreate()
     {
-        var data = _booFaker.Generate();
-        await _context.Boos.AddAsync(data);
-        await _context.SaveChangesAsync();
+        Entities.Boo data = this._booFaker.Generate();
+        await this._context.Boos.AddAsync(data);
+        await this._context.SaveChangesAsync();
 
-        var dataFromDb = await _context.Boos.FirstOrDefaultAsync(w => w.Id.Equals(data.Id));
+        Entities.Boo? dataFromDb = await this._context.Boos.FirstOrDefaultAsync(w => w.Id.Equals(data.Id));
 
         Assert.NotNull(dataFromDb);
-        Assert.DoesNotMatch(utcMinValue.ToString("O"), dataFromDb.CreatedAt.ToString("O"));
-        Assert.DoesNotMatch(utcMinValue.ToString("O"), dataFromDb.UpdatedAt.ToString("O"));
+        Assert.DoesNotMatch(this.utcMinValue.ToString("O"), dataFromDb.CreatedAt.ToString("O"));
+        Assert.DoesNotMatch(this.utcMinValue.ToString("O"), dataFromDb.UpdatedAt.ToString("O"));
     }
 
     [Fact]
     public async Task Should_UpdateUpdatedAt_OnDateTimeUpdate()
     {
-        var data = await this.AddAsync(_booFaker.Generate());
+        Entities.Boo data = await AddAsync(this._booFaker.Generate());
 
-        var oldUpdatedAt = data.UpdatedAt;
+        DateTime oldUpdatedAt = data.UpdatedAt;
 
-        data.Name = _booFaker.Generate().Name;
+        data.Name = this._booFaker.Generate().Name;
 
-        _context.Boos.Update(data);
-        var updated = await _context.SaveChangesAsync();
+        this._context.Boos.Update(data);
+        var updated = await this._context.SaveChangesAsync();
 
         Assert.True(updated > 0);
 
-        var dataFromDb = await _context.Boos.FirstOrDefaultAsync(w => w.Id.Equals(data.Id));
+        Entities.Boo? dataFromDb = await this._context.Boos.FirstOrDefaultAsync(w => w.Id.Equals(data.Id));
 
         Assert.NotNull(dataFromDb);
         Assert.DoesNotMatch(oldUpdatedAt.ToString("O"), dataFromDb.UpdatedAt.ToString("O"));
@@ -41,34 +41,78 @@ public class TimestampsTests : BaseTest
     [Fact]
     public async Task Should_SetCreatedAt_OnUnixCreate()
     {
-        var data = await this.AddAsync(_fooFaker.Generate());
+        Entities.Foo data = await AddAsync(this._fooFaker.Generate());
 
-        var dataFromDb = await _context.Foos.FirstOrDefaultAsync(w => w.Id.Equals(data.Id));
+        Entities.Foo? dataFromDb = await this._context.Foos.FirstOrDefaultAsync(w => w.Id.Equals(data.Id));
 
         Assert.NotNull(dataFromDb);
-        Assert.DoesNotMatch(utcMinValue.ToUnixTimeMilliseconds().ToString(), dataFromDb.CreatedAt.ToString());
-        Assert.DoesNotMatch(utcMinValue.ToUnixTimeMilliseconds().ToString(), dataFromDb.UpdatedAt.ToString());
+        Assert.DoesNotMatch(this.utcMinValue.ToUnixTimeMilliseconds().ToString(), dataFromDb.CreatedAt.ToString());
+        Assert.DoesNotMatch(this.utcMinValue.ToUnixTimeMilliseconds().ToString(), dataFromDb.UpdatedAt.ToString());
     }
 
     [Fact]
     public async Task Should_UpdateUpdatedAt_OnUnixUpdate()
     {
-        var data = await this.AddAsync(_fooFaker.Generate());
+        Entities.Foo data = await AddAsync(this._fooFaker.Generate());
 
         await Task.Delay(5);
 
         var oldUpdatedAt = data.UpdatedAt;
 
-        data.Name = _fooFaker.Generate().Name;
+        data.Name = this._fooFaker.Generate().Name;
 
-        _context.Foos.Update(data);
-        var updated = await _context.SaveChangesAsync();
+        this._context.Foos.Update(data);
+        var updated = await this._context.SaveChangesAsync();
 
         Assert.True(updated > 0);
 
-        var dataFromDb = await _context.Foos.FirstOrDefaultAsync(w => w.Id.Equals(data.Id));
+        Entities.Foo? dataFromDb = await this._context.Foos.FirstOrDefaultAsync(w => w.Id.Equals(data.Id));
 
         Assert.NotNull(dataFromDb);
         Assert.DoesNotMatch(oldUpdatedAt.ToString(), dataFromDb.UpdatedAt.ToString());
     }
+
+    [Fact]
+    public async Task Should_Throw_When_TimeStampsField_NotMatch()
+    {
+        Entities.Aoo data = this._aooFaker.Generate();
+        await this._context.Aoos.AddAsync(data);
+
+        await Assert.ThrowsAsync<InvalidCastException>(() => this._context.SaveChangesAsync());
+    }
+
+    [Fact]
+    public async Task Should_SetCreatedAtField_OnCustomTimeStamps()
+    {
+        Entities.Boo data = this._booFaker.Generate();
+        await this._context.Boos.AddAsync(data);
+        await this._context.SaveChangesAsync();
+
+        Entities.Boo? dataFromDb = await this._context.Boos.FirstOrDefaultAsync(w => w.Id.Equals(data.Id));
+
+        Assert.NotNull(dataFromDb);
+        Assert.DoesNotMatch(this.utcMinValue.ToString("O"), dataFromDb.CreatedAt.ToString("O"));
+        Assert.DoesNotMatch(this.utcMinValue.ToString("O"), dataFromDb.UpdatedAt.ToString("O"));
+    }
+
+    [Fact]
+    public async Task Should_UpdateUpdatedAtField_OnCustomTimeStamps()
+    {
+        Entities.Boo data = await AddAsync(this._booFaker.Generate());
+
+        DateTime oldUpdatedAt = data.UpdatedAt;
+
+        data.Name = this._booFaker.Generate().Name;
+
+        this._context.Boos.Update(data);
+        var updated = await this._context.SaveChangesAsync();
+
+        Assert.True(updated > 0);
+
+        Entities.Boo? dataFromDb = await this._context.Boos.FirstOrDefaultAsync(w => w.Id.Equals(data.Id));
+
+        Assert.NotNull(dataFromDb);
+        Assert.DoesNotMatch(oldUpdatedAt.ToString("O"), dataFromDb.UpdatedAt.ToString("O"));
+    }
+
 }

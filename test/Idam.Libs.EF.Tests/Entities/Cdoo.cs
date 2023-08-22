@@ -3,24 +3,23 @@ using Idam.Libs.EF.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
 namespace Idam.Libs.EF.Tests.Entities;
-
 /// <summary>
-/// Foo entity
+/// Entity for custom timestamps fields.
 /// </summary>
-[TimeStampsUnix]
-public class Foo : IGuidEntity, ITimeStampsUnix, ISoftDeleteUnix
+/// <seealso cref="IGuidEntity" />
+[TimeStamps(CreatedAtField = nameof(AddedAt), UpdatedAtField = nameof(EditedAt), DeletedAtField = nameof(RemovedAt))]
+public class Cdoo : IGuidEntity
 {
     public Guid Id { get; set; }
-
     [StringLength(191)]
     public string Name { get; set; } = default!;
 
     [StringLength(191)]
     public string? Description { get; set; }
 
-    public long CreatedAt { get; set; }
+    public DateTime AddedAt { get; set; }
 
-    public long UpdatedAt { get; set; }
+    public DateTime EditedAt { get; set; }
 
-    public long? DeletedAt { get; set; }
+    public DateTime? RemovedAt { get; set; }
 }

@@ -10,17 +10,23 @@ public abstract class BaseTest
 
     protected readonly BooFaker _booFaker;
     protected readonly FooFaker _fooFaker;
+    protected readonly AooFaker _aooFaker;
+    protected readonly DooFaker _dooFaker;
+    protected readonly CdooFaker _cdooFaker;
 
     protected readonly DateTime utcMinValue;
 
     public BaseTest()
     {
-        _context = new TestDbContext();
-        _context.Database.EnsureCreated();
+        this._context = new TestDbContext();
+        this._context.Database.EnsureCreated();
 
-        _booFaker = new BooFaker();
-        _fooFaker = new FooFaker();
-        utcMinValue = DateTime.MinValue.ToUniversalTime();
+        this._booFaker = new();
+        this._fooFaker = new();
+        this._aooFaker = new();
+        this._dooFaker = new();
+        this._cdooFaker = new();
+        this.utcMinValue = DateTime.MinValue.ToUniversalTime();
     }
 
     /// <summary>Generic add async</summary>
@@ -32,7 +38,7 @@ public abstract class BaseTest
     {
         Assert.NotNull(data);
 
-        _context.Set<TEntity>().Add(data);
+        this._context.Set<TEntity>().Add(data);
         var created = await this._context.SaveChangesAsync();
 
         Assert.True(created > 0);

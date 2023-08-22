@@ -3,12 +3,14 @@ using Idam.Libs.EF.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
 namespace Idam.Libs.EF.Tests.Entities;
-
+/// <summary>
+/// Entity for error data type invalid test.
+/// </summary>
+/// <seealso cref="IGuidEntity" />
 [TimeStamps]
-public class Boo : IGuidEntity, ITimeStamps, ISoftDelete
+public class Doo : IGuidEntity, ITimeStamps
 {
     public Guid Id { get; set; }
-
     [StringLength(191)]
     public string Name { get; set; } = default!;
 
@@ -19,5 +21,5 @@ public class Boo : IGuidEntity, ITimeStamps, ISoftDelete
 
     public DateTime UpdatedAt { get; set; }
 
-    public DateTime? DeletedAt { get; set; } = null;
+    public DateTime DeletedAt { get; set; }
 }
