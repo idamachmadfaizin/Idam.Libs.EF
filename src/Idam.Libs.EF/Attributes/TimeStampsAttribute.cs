@@ -25,6 +25,24 @@ public class TimeStampsAttribute : Attribute
 }
 
 /// <summary>
+/// TimeStamps Unix Attribute.
+/// </summary>
+/// <seealso cref="TimeStampsAttribute" />
+public sealed class TimeStampsUnixAttribute : TimeStampsAttribute
+{
+    public override TimeStampsType TimeStampsType { get; set; } = TimeStampsType.Unix;
+}
+
+/// <summary>
+/// TimeStamps Utc DateTime Attribute.
+/// </summary>
+/// <seealso cref="TimeStampsAttribute" />
+public sealed class TimeStampsUtcAttribute : TimeStampsAttribute
+{
+    public override TimeStampsType TimeStampsType { get; set; } = TimeStampsType.UtcDateTime;
+}
+
+/// <summary>
 /// TimeStamps Type Extensions
 /// </summary>
 internal static class TimeStampsTypeExtensions
