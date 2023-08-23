@@ -21,12 +21,7 @@ public static class DbContextExtensions
     {
         foreach (EntityEntry entityEntry in changeTracker.Entries())
         {
-            TimeStampsAttribute? timeStampsAttribute = entityEntry.Entity.GetType().GetCustomAttribute<TimeStampsAttribute>();
-
-            if (timeStampsAttribute is not null)
-            {
-                AddTimestamps(entityEntry, timeStampsAttribute);
-            }
+            entityEntry.AddTimestamps();
         }
     }
 
@@ -34,45 +29,66 @@ public static class DbContextExtensions
     /// Add timestamps to the Entity with TimeStampsAttribute when state is Added or Modified or Deleted.
     /// </summary>
     /// <param name="entityEntry">The entity entry.</param>
-    /// <param name="timeStampsAttribute">The time stamps attribute.</param>
     /// <exception cref="InvalidCastException"></exception>
-    private static void AddTimestamps(this EntityEntry? entityEntry, TimeStampsAttribute timeStampsAttribute)
+    private static void AddTimestamps(this EntityEntry? entityEntry)
     {
         if (entityEntry is null) return;
+
+        TimeStampsAttribute? timeStampsAttribute = entityEntry.Entity.GetType().GetCustomAttribute<TimeStampsAttribute>();
+
+        if (timeStampsAttribute is null) return;
 
         // current datetime
         var now = timeStampsAttribute.TimeStampsType.GetMapValue();
 
         Type entityType = entityEntry.Entity.GetType();
-        PropertyInfo? createdAtProperty = entityType.GetProperty(timeStampsAttribute.CreatedAtField);
-        PropertyInfo? updatedAtProperty = entityType.GetProperty(timeStampsAttribute.UpdatedAtField);
-        PropertyInfo? deletedAtProperty = entityType.GetProperty(timeStampsAttribute.DeletedAtField);
+
+        var useCreatedAtField = !string.IsNullOrWhiteSpace(timeStampsAttribute.CreatedAtField);
+        var useUpdatedAtField = !string.IsNullOrWhiteSpace(timeStampsAttribute.UpdatedAtField);
+        var useDeletedAtField = !string.IsNullOrWhiteSpace(timeStampsAttribute.DeletedAtField);
+
+        PropertyInfo? createdAtProperty = useCreatedAtField ? entityType.GetProperty(timeStampsAttribute.CreatedAtField!) : null;
+        PropertyInfo? updatedAtProperty = useUpdatedAtField ? entityType.GetProperty(timeStampsAttribute.UpdatedAtField!) : null;
+        PropertyInfo? deletedAtProperty = useDeletedAtField ? entityType.GetProperty(timeStampsAttribute.DeletedAtField!) : null;
 
         switch (entityEntry.State)
         {
             case EntityState.Modified:
                 InvalidCastValidationException.ThrowIfInvalidTimeStamps(timeStampsAttribute.UpdatedAtField, entityType, timeStampsAttribute);
 
-                updatedAtProperty!.SetValue(entityEntry.Entity, now, null);
+                if (useUpdatedAtField)
+                {
+                    updatedAtProperty!.SetValue(entityEntry.Entity, now, null);
+                }
                 break;
 
             case EntityState.Added:
                 InvalidCastValidationException.ThrowIfInvalidTimeStamps(timeStampsAttribute.CreatedAtField, entityType, timeStampsAttribute);
                 InvalidCastValidationException.ThrowIfInvalidTimeStamps(timeStampsAttribute.UpdatedAtField, entityType, timeStampsAttribute);
 
-                createdAtProperty!.SetValue(entityEntry.Entity, now, null);
-                updatedAtProperty!.SetValue(entityEntry.Entity, now, null);
+                if (useUpdatedAtField)
+                {
+                    createdAtProperty!.SetValue(entityEntry.Entity, now, null);
+                }
+
+                if (useUpdatedAtField)
+                {
+                    updatedAtProperty!.SetValue(entityEntry.Entity, now, null);
+                }
                 break;
 
             case EntityState.Deleted:
                 InvalidCastValidationException.ThrowIfInvalidTimeStamps(timeStampsAttribute.DeletedAtField, entityType, timeStampsAttribute);
 
-                var value = deletedAtProperty!.GetValue(entityEntry.Entity);
-
-                if (value is null)
+                if (useDeletedAtField)
                 {
-                    entityEntry.State = EntityState.Modified;
-                    deletedAtProperty.SetValue(entityEntry.Entity, now, null);
+                    var value = deletedAtProperty!.GetValue(entityEntry.Entity);
+
+                    if (value is null)
+                    {
+                        entityEntry.State = EntityState.Modified;
+                        deletedAtProperty.SetValue(entityEntry.Entity, now, null);
+                    }
                 }
                 break;
 
@@ -109,7 +125,7 @@ public static class DbContextExtensions
 
         TimeStampsAttribute? timeStampsAttribute = mutable.ClrType.GetCustomAttribute<TimeStampsAttribute>();
 
-        if (timeStampsAttribute is null) return;
+        if (timeStampsAttribute is null || string.IsNullOrWhiteSpace(timeStampsAttribute.DeletedAtField)) return;
 
         ParameterExpression parameter = Expression.Parameter(mutable.ClrType, "e");
 

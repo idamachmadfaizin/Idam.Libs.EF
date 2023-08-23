@@ -19,9 +19,9 @@ public enum TimeStampsType
 public class TimeStampsAttribute : Attribute
 {
     public virtual TimeStampsType TimeStampsType { get; set; } = TimeStampsType.DateTime;
-    public virtual string CreatedAtField { get; set; } = "CreatedAt";
-    public virtual string UpdatedAtField { get; set; } = "UpdatedAt";
-    public virtual string DeletedAtField { get; set; } = "DeletedAt";
+    public virtual string? CreatedAtField { get; set; } = "CreatedAt";
+    public virtual string? UpdatedAtField { get; set; } = "UpdatedAt";
+    public virtual string? DeletedAtField { get; set; } = "DeletedAt";
 }
 
 /// <summary>

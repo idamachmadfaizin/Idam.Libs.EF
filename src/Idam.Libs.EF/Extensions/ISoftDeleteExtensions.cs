@@ -14,7 +14,7 @@ public static class ISoftDeleteExtensions
     /// </returns>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="InvalidCastException"></exception>
-    public static bool IsDeleted(this ISoftDeleteBase entity)
+    public static bool Trashed(this ISoftDeleteBase entity)
     {
         ArgumentNullException.ThrowIfNull(entity, nameof(entity));
 
@@ -23,9 +23,15 @@ public static class ISoftDeleteExtensions
 
         ArgumentNullException.ThrowIfNull(timeStampsAttribute, nameof(timeStampsAttribute));
 
+        var useDeletedAtField = !string.IsNullOrWhiteSpace(timeStampsAttribute.DeletedAtField);
+        if (useDeletedAtField == false)
+        {
+            throw new Exception($"The entity '{entityType.Name}' not implement SoftDelete.");
+        }
+
         InvalidCastValidationException.ThrowIfInvalidTimeStamps(timeStampsAttribute.DeletedAtField, entityType, timeStampsAttribute);
 
-        PropertyInfo? deletedAtProperty = entityType.GetProperty(timeStampsAttribute.DeletedAtField);
+        PropertyInfo? deletedAtProperty = useDeletedAtField ? entityType.GetProperty(timeStampsAttribute.DeletedAtField!) : null;
 
         var value = deletedAtProperty!.GetValue(entity);
 

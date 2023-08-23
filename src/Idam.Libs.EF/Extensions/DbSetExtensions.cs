@@ -26,9 +26,15 @@ public static class DbSetExtensions
 
         ArgumentNullException.ThrowIfNull(timeStampsAttribute, nameof(timeStampsAttribute));
 
+        var useDeletedAtField = !string.IsNullOrWhiteSpace(timeStampsAttribute.DeletedAtField);
+        if (useDeletedAtField == false)
+        {
+            throw new Exception($"The entity '{entityType.Name}' not implement SoftDelete.");
+        }
+
         InvalidCastValidationException.ThrowIfInvalidTimeStamps(timeStampsAttribute.DeletedAtField, entityType, timeStampsAttribute);
 
-        PropertyInfo? deletedAtProperty = entityType.GetProperty(timeStampsAttribute.DeletedAtField);
+        PropertyInfo? deletedAtProperty = useDeletedAtField ? entityType.GetProperty(timeStampsAttribute.DeletedAtField!) : null;
 
         deletedAtProperty!.SetValue(entity, null, null);
 
@@ -54,9 +60,15 @@ public static class DbSetExtensions
 
         ArgumentNullException.ThrowIfNull(timeStampsAttribute, nameof(timeStampsAttribute));
 
-        PropertyInfo? deletedAtProperty = entityType.GetProperty(timeStampsAttribute.DeletedAtField);
+        var useDeletedAtField = !string.IsNullOrWhiteSpace(timeStampsAttribute.DeletedAtField);
+        if (useDeletedAtField == false)
+        {
+            throw new Exception($"The entity '{entityType.Name}' not implement SoftDelete.");
+        }
 
         InvalidCastValidationException.ThrowIfInvalidTimeStamps(timeStampsAttribute.DeletedAtField, entityType, timeStampsAttribute);
+
+        PropertyInfo? deletedAtProperty = useDeletedAtField ? entityType.GetProperty(timeStampsAttribute.DeletedAtField!) : null;
 
         var now = timeStampsAttribute.TimeStampsType.GetMapValue();
 
