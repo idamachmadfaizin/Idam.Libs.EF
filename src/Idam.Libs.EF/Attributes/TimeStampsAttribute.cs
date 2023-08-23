@@ -53,14 +53,11 @@ internal static class TimeStampsTypeExtensions
     /// <param name="timeStampsType">Type of the time stamps.</param>
     /// <returns></returns>
     /// <seealso cref="TimeStampsType" />
-    public static Type GetMapType(this TimeStampsType timeStampsType)
+    public static Type GetMapType(this TimeStampsType timeStampsType) => timeStampsType switch
     {
-        return timeStampsType switch
-        {
-            TimeStampsType.Unix => typeof(long),
-            _ => typeof(DateTime),
-        };
-    }
+        TimeStampsType.Unix => typeof(long),
+        _ => typeof(DateTime),
+    };
 
     /// <summary>
     /// Corresponding data type for the given TimeStampsType enum value.
@@ -68,14 +65,11 @@ internal static class TimeStampsTypeExtensions
     /// <param name="timeStampsType">Type of the time stamps.</param>
     /// <returns></returns>
     /// <seealso cref="TimeStampsType" />
-    public static Type GetNullableMapType(this TimeStampsType timeStampsType)
+    public static Type GetNullableMapType(this TimeStampsType timeStampsType) => timeStampsType switch
     {
-        return timeStampsType switch
-        {
-            TimeStampsType.Unix => typeof(long?),
-            _ => typeof(DateTime?),
-        };
-    }
+        TimeStampsType.Unix => typeof(long?),
+        _ => typeof(DateTime?),
+    };
 
     /// <summary>
     /// Corresponding date value as DateTime or long type for given TimeStampsType enum value.
@@ -83,13 +77,10 @@ internal static class TimeStampsTypeExtensions
     /// <param name="timeStampsType">Type of the time stamps.</param>
     /// <returns>UTC DateTime or DateTime or long.</returns>
     /// <seealso cref="TimeStampsType" />
-    public static object GetMapValue(this TimeStampsType timeStampsType)
+    public static object GetMapValue(this TimeStampsType timeStampsType) => timeStampsType switch
     {
-        return timeStampsType switch
-        {
-            TimeStampsType.Unix => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-            TimeStampsType.UtcDateTime => DateTime.UtcNow,
-            _ => DateTime.Now,
-        };
-    }
+        TimeStampsType.Unix => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+        TimeStampsType.UtcDateTime => DateTime.UtcNow,
+        _ => DateTime.Now,
+    };
 }

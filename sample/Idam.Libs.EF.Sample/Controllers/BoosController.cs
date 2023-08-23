@@ -48,7 +48,7 @@ namespace Idam.Libs.EF.Sample.Controllers
         }
 
         // PUT: api/Boos/289c9eaa-3f35-4462-064a-08db6654a8e7
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // To protect from over posting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutBoo(Guid id, BooUpdateDto booDto)
         {
@@ -79,7 +79,7 @@ namespace Idam.Libs.EF.Sample.Controllers
         }
 
         // POST: api/Boos
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // To protect from over posting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Boo>> PostBoo(BooCreateDto booDto)
         {
@@ -198,9 +198,7 @@ namespace Idam.Libs.EF.Sample.Controllers
             return NoContent();
         }
 
-        private bool BooExists(Guid id)
-        {
-            return (_context.Boos?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+        private bool BooExists(Guid id) =>
+            (_context.Boos?.Any(e => e.Id == id)).GetValueOrDefault();
     }
 }
