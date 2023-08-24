@@ -13,11 +13,12 @@ public class TestDbContext : DbContext
     {
     }
 
-    public DbSet<Foo> Foos { get; set; }
-    public DbSet<Boo> Boos { get; set; }
     public DbSet<Aoo> Aoos { get; set; }
+    public DbSet<Boo> Boos { get; set; }
+    public DbSet<Coo> Coos { get; set; }
     public DbSet<Doo> Doos { get; set; }
-    public DbSet<Cdoo> Cdoos { get; set; }
+    public DbSet<Eoo> Eoos { get; set; }
+    public DbSet<Foo> Foos { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

@@ -2,9 +2,10 @@
 using Idam.Libs.EF.Tests.Entities;
 
 namespace Idam.Libs.EF.Tests.Faker;
-public class CdooFaker : Faker<Cdoo>
+public class BaseFaker<T> : Faker<T>
+    where T : BaseEntity
 {
-    public CdooFaker()
+    public BaseFaker()
     {
         var random = new Randomizer();
 
