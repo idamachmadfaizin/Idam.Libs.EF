@@ -48,7 +48,7 @@ public class FoosController : ControllerBase
     }
 
     // PUT: api/Foos/289c9eaa-3f35-4462-064a-08db6654a8e7
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    // To protect from over posting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPut("{id}")]
     public async Task<IActionResult> PutFoo(Guid id, FooUpdateDto fooDto)
     {
@@ -79,7 +79,7 @@ public class FoosController : ControllerBase
     }
 
     // POST: api/Foos
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    // To protect from over posting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
     public async Task<ActionResult<Foo>> PostFoo(FooCreateDto fooDto)
     {
@@ -178,8 +178,5 @@ public class FoosController : ControllerBase
         return NoContent();
     }
 
-    private bool FooExists(Guid id)
-    {
-        return (_context.Foos?.Any(e => e.Id == id)).GetValueOrDefault();
-    }
+    private bool FooExists(Guid id) => (_context.Foos?.Any(e => e.Id == id)).GetValueOrDefault();
 }
