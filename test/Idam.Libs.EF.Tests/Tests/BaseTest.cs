@@ -8,11 +8,12 @@ public abstract class BaseTest
 {
     protected readonly TestDbContext _context;
 
-    protected readonly BooFaker _booFaker;
-    protected readonly FooFaker _fooFaker;
     protected readonly AooFaker _aooFaker;
+    protected readonly BooFaker _booFaker;
+    protected readonly CooFaker _cooFaker;
     protected readonly DooFaker _dooFaker;
-    protected readonly CdooFaker _cdooFaker;
+    protected readonly EooFaker _eooFaker;
+    protected readonly FooFaker _fooFaker;
 
     protected readonly DateTime utcMinValue;
 
@@ -21,11 +22,13 @@ public abstract class BaseTest
         this._context = new TestDbContext();
         this._context.Database.EnsureCreated();
 
-        this._booFaker = new();
-        this._fooFaker = new();
         this._aooFaker = new();
+        this._booFaker = new();
+        this._cooFaker = new();
         this._dooFaker = new();
-        this._cdooFaker = new();
+        this._eooFaker = new();
+        this._fooFaker = new();
+
         this.utcMinValue = DateTime.MinValue.ToUniversalTime();
     }
 
