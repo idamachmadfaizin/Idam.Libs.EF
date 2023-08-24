@@ -66,7 +66,7 @@ public static class DbContextExtensions
                 InvalidCastValidationException.ThrowIfInvalidTimeStamps(timeStampsAttribute.CreatedAtField, entityType, timeStampsAttribute);
                 InvalidCastValidationException.ThrowIfInvalidTimeStamps(timeStampsAttribute.UpdatedAtField, entityType, timeStampsAttribute);
 
-                if (useUpdatedAtField)
+                if (useCreatedAtField)
                 {
                     createdAtProperty!.SetValue(entityEntry.Entity, now, null);
                 }
@@ -103,14 +103,11 @@ public static class DbContextExtensions
     /// <param name="builder">The builder.</param>
     public static void AddSoftDeleteFilter(this ModelBuilder builder)
     {
-        IEnumerable<IMutableEntityType>? mutables = builder.Model.GetEntityTypes();
+        IEnumerable<IMutableEntityType> mutables = builder.Model.GetEntityTypes();
 
-        if (mutables is not null)
+        foreach (IMutableEntityType mutable in mutables)
         {
-            foreach (IMutableEntityType mutable in mutables)
-            {
-                builder.AddSoftDeleteFilter(mutable);
-            }
+            builder.AddSoftDeleteFilter(mutable);
         }
     }
 
