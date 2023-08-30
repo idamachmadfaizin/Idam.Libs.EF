@@ -18,7 +18,7 @@
 Features: 
 - Soft delete (DeletedAt) as unix or DateTime
 - Timestamps (CreatedAt, UpdatedAt) as unix or DateTime</Description>
-		<Version>2.1.0</Version>
+		<Version>7.0.0</Version>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	</PropertyGroup>
 
