@@ -133,4 +133,18 @@ public class TimestampsTests : BaseTest
         Assert.NotNull(dataFromDb);
         Assert.DoesNotMatch(DateTime.MinValue.ToString("O"), dataFromDb.UpdatedAt.ToString("O"));
     }
+
+    [Fact]
+    public async Task When_TimeStampsUtc_TheDateTimeKind_Should_Utc()
+    {
+        Goo data = await AddAsync(this._gooFaker.Generate());
+
+        Goo? dataFromDb = await this._context.Goos
+            .FirstOrDefaultAsync(w => w.Id.Equals(data.Id));
+
+        Assert.NotNull(dataFromDb);
+        Assert.DoesNotMatch(DateTime.MinValue.ToString("O"), dataFromDb.UpdatedAt.ToString("O"));
+        Assert.True(dataFromDb.CreatedAt.Kind.Equals(DateTimeKind.Utc));
+        Assert.True(dataFromDb.UpdatedAt.Kind.Equals(DateTimeKind.Utc));
+    }
 }

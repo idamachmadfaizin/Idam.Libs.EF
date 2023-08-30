@@ -14,9 +14,13 @@ public abstract class BaseTest
     protected readonly DooFaker _dooFaker;
     protected readonly EooFaker _eooFaker;
     protected readonly FooFaker _fooFaker;
+    protected readonly GooFaker _gooFaker;
 
     protected readonly DateTime utcMinValue;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BaseTest"/> class.
+    /// </summary>
     public BaseTest()
     {
         this._context = new TestDbContext();
@@ -28,6 +32,7 @@ public abstract class BaseTest
         this._dooFaker = new();
         this._eooFaker = new();
         this._fooFaker = new();
+        this._gooFaker = new();
 
         this.utcMinValue = DateTime.MinValue.ToUniversalTime();
     }

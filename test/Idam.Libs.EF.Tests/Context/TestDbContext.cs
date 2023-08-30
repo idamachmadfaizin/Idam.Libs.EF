@@ -19,6 +19,7 @@ public class TestDbContext : DbContext
     public DbSet<Doo> Doos { get; set; }
     public DbSet<Eoo> Eoos { get; set; }
     public DbSet<Foo> Foos { get; set; }
+    public DbSet<Goo> Goos { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

@@ -159,4 +159,20 @@ public class SoftDeleteTests : BaseTest
 
         _ = await Assert.ThrowsAsync<InvalidCastException>(() => DeleteAsync(data));
     }
+
+    [Fact]
+    public async Task When_SoftDeleted_Should_SetDateTimeKindUtc_OnDeletedAt()
+    {
+        Goo data = await AddAsync(this._gooFaker.Generate());
+        data = await DeleteAsync(data);
+
+        Goo? dataFromDb = await this._context.Goos
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(x => x.Id.Equals(data.Id));
+
+        Assert.NotNull(dataFromDb);
+        _ = Assert.NotNull(dataFromDb.DeletedAt);
+        Assert.True(dataFromDb.Trashed());
+        Assert.True(dataFromDb.DeletedAt!.Value.Kind.Equals(DateTimeKind.Utc));
+    }
 }
