@@ -59,7 +59,7 @@ dotnet tool install Idam.Libs.EF
     }
     ```
 
-2. Add an attribute (`TimeStamps` or `TimeStampsUtc` or `TimeStampsUnix`) to your entity. You can also implement an Interface (`ITimeStamps` or `ITimeStampsUnix`) accordion attribute you use.
+2. Add an attribute (`TimeStamps` or `TimeStampsUtc` or `TimeStampsUnix`) to your entity. You can also implement an Interface (`ITimeStamps` or `ITimeStampsUnix`) according attribute you use.
 
     ```cs
     using Idam.Libs.EF.Attributes;
@@ -130,19 +130,11 @@ dotnet tool install Idam.Libs.EF
     }
     ```
 
-2. Add an attribute (`TimeStamps` or `TimeStampsUtc` or `TimeStampsUnix`) to your entity. You can also implement an Interface (`ISoftDelete` or `ISoftDeleteUnix`) accordion attribute you use.
+2. Add an attribute (`TimeStamps` or `TimeStampsUtc` or `TimeStampsUnix`) to your entity. You can also implement an Interface (`ISoftDelete` or `ISoftDeleteUnix`) according attribute you use.
 
     ```cs
     using Idam.Libs.EF.Attributes;
     using Idam.Libs.EF.Interfaces;
-
-    /// BaseEntity
-    public class BaseEntity
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = default!;
-        public string? Description { get; set; }
-    }
 
     /// Using DateTime Format
     [TimeStamps]
@@ -165,6 +157,8 @@ dotnet tool install Idam.Libs.EF
         public long? DeletedAt { get; set; }
     }
     ```
+
+#### Restore
 
 The SoftDelete has a `Restore()` function, so you can restore the deleted data.
 
@@ -192,25 +186,7 @@ public class FooController
 }
 ```
 
-Also, you can ignore the global softdelete filter by using `IgnoreQueryFilters()`.
-
-```cs
-/// Foo Controller
-public class FooController
-{
-    readonly MyDbContext _context;
-
-    public async Task<IActionResult> GetAllDeletedAsync()
-    {
-        var deletedFoos = await _context.Foos
-            .IgnoreQueryFilters()
-            .Where(x => x.DeletedAt != null)
-            .ToListAsync();
-
-        return Ok(deletedFoos);
-    }
-}
-```
+#### ForceRemove
 
 The SoftDelete has a `ForceRemove()` function, so you can permanently remove the data.
 
@@ -230,7 +206,28 @@ public class FooController
 }
 ```
 
+#### Trashed
+
 The SoftDelete has a `Trashed()` function to check if current data is deleted.
+
+```cs
+/// Foo Controller
+public class FooController
+{
+    public IActionResult IsDeletedFoo(Foo foo)
+    {
+        bool isDeleted = foo.Trashed();
+        
+        return Ok(isDeleted);
+    }
+}
+```
+
+> The `Trashed()` function only shows when your entity implements an interface `ISoftDelete` or `ISoftDeleteUnix`.
+
+#### Ignore global softdelete filter
+
+By default the deleted data filtered from the query, if you want to get the deleted data you can ignore the global softdelete filter by using `IgnoreQueryFilters()`.
 
 ```cs
 /// Foo Controller
@@ -238,18 +235,17 @@ public class FooController
 {
     readonly MyDbContext _context;
 
-    public async Task<IActionResult> ForceRemoveAsync(Foo foo)
+    public async Task<IActionResult> GetAllDeletedAsync()
     {
-        bool isDeletedFoo = foo.Trashed();
-        _context.Foos.ForceRemove(foo);
-        await context.SaveChangesAsync();
-        
-        return Ok(restoredFoo);
+        var deletedFoos = await _context.Foos
+            .IgnoreQueryFilters()
+            .Where(x => x.DeletedAt != null)
+            .ToListAsync();
+
+        return Ok(deletedFoos);
     }
 }
 ```
-
-> The `Trashed()` function only shows when your entity implements an interface `ISoftDelete` or `ISoftDeleteUnix`.
 
 ### Using Custom TimeStamps fields.
 
@@ -281,9 +277,9 @@ By default, the TimeStamps attribute uses CreatedAt, UpdatedAt, and DeletedAt as
 
     > Tips: Create your interface according to your own TimeStamps attribute.
 
-### Using Few TimeStamps attribute
+### Using just few TimeStamps attribute
 
-You can use just a few TimeStamps fields by filling in null or string empty.
+You can use just a few TimeStamps fields by filling in null or string empty to fields you don't use.
 
 1. Create your own TimeStamps attribute.
 
@@ -326,4 +322,4 @@ public class Foo : IGuidEntity
 ## Migrating
 Migrating from 2.1.0
 
-1. Add [TimeStamps] or [TimeStampsUnix] or [TimeStampsUtc] attribute to your entities.
+1. Add [TimeStampsUtc] or [TimeStampsUnix] attribute to your entities according to your TimeStamps data type before.
