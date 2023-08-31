@@ -247,7 +247,7 @@ public class FooController
 }
 ```
 
-### Using Custom TimeStamps fields.
+### Using Custom TimeStamps fields
 
 By default, the TimeStamps attribute uses CreatedAt, UpdatedAt, and DeletedAt as field names. It's possible to customize the TimeStamps fields.
 
@@ -277,7 +277,7 @@ By default, the TimeStamps attribute uses CreatedAt, UpdatedAt, and DeletedAt as
 
     > Tips: Create your interface according to your own TimeStamps attribute.
 
-### Using just few TimeStamps attribute
+### Using just few TimeStamps fields
 
 You can use just a few TimeStamps fields by filling in null or string empty to fields you don't use.
 
