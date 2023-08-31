@@ -11,6 +11,7 @@
 		<PackageReleaseNotes>- Use attribute
 - Support custom timestamps fields
 - Support DateTime, UTC DateTime, and Unix data type
+- support using just few TimeStamps fields
 - Add ForceRemove function
 - Add Trashed function
 - Add Restore function
