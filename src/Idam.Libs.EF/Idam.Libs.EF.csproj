@@ -24,7 +24,7 @@ Features:
 - Timestamps (CreatedAt, UpdatedAt) as Unix or UTC DateTime or DateTime.
 - Custom TimeStamps fields.</Description>
 		<Version>7.0.0</Version>
-		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -36,7 +36,7 @@ Features:
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Include="..\..\LICENSE.txt">
+	  <None Include="..\..\LICENSE">
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
