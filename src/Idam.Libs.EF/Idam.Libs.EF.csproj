@@ -14,10 +14,13 @@
 - fix softdelete query filter</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/idamachmadfaizin/Idam.Libs.EF</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/idamachmadfaizin/Idam.Libs.EF</RepositoryUrl>
-		<Description>Idam.Libs.EF is .Net Core (C#) for Entity Framework (EF) Utils.
-Features: 
-- Soft delete (DeletedAt) as unix or DateTime
-- Timestamps (CreatedAt, UpdatedAt) as unix or DateTime</Description>
+		<Description>
+			Idam.Libs.EF is .Net Core (C#) for Entity Framework (EF) Utils.
+			Features:
+			- Soft delete (DeletedAt) as DateTime, UTC DateTime, and Unix.
+			- Timestamps (CreatedAt, UpdatedAt) as DateTime, UTC DateTime, and Unix.
+			- Custom Timestamps fields.
+		</Description>
 		<Version>7.0.0</Version>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	</PropertyGroup>
